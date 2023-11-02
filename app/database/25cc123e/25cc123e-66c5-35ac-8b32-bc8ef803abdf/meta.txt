@@ -1,0 +1,7 @@
+uuid=25cc123e-66c5-35ac-8b32-bc8ef803abdf
+name=sample1.txt
+path=samples
+hash=98761b5a2a344713caa33bb94bcf0b77
+date=2023-11-02 10:27:11
+mime=text/plain; charset=utf-8
+size=2050

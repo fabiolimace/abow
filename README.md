@@ -1,2 +1,5 @@
-# abow
-ABOW - Awk Bag of Words
+# ABoW
+
+ABoW stands for Awk Bag of Words
+
+
