@@ -16,8 +16,8 @@ function import_file {
     if [[ ! -f "$INPUT_FILE" ]];
     then
         echo "abow-import.sh: $INPUT_FILE: File not found" > /dev/stderr;
-        exit 1;
-    fi
+        return;
+    fi;
     
     local UUID=` uuidgen --md5 --namespace @url --name "$INPUT_FILE"`
     local SUID=`echo $UUID | cut -d- -f1`
@@ -26,10 +26,10 @@ function import_file {
     local META=$ITEM/meta.txt
     local DATA=$ITEM/data.tsv
     
-    if [[ -d $ITEM ]];
+    if [[ ! ${options["f"]} && -d $ITEM ]];
     then
         echo "abow-import.sh: $INPUT_FILE: Already imported" > /dev/stderr;
-        exit 1;
+        return;
     fi;
     
     mkdir --parents $ITEM;
@@ -45,34 +45,72 @@ function import_file {
     echo "size=`wc -c $INPUT_FILE | cut -d" " -f1`" >> $META
    
     $BASEDIR/abow-compute.sh $TEXT $DATA
-}
-
-function parse_args {
-
-    args=${1}
-    args=${args//--recursive/-r} # TODO
-    args=${args//--help/-h}      # TODO
-
-    shopt -s extglob
-    args=${args//--+([a-zA-Z0-9-])/-?}
-
-    declare -A options;
-    OPTSTRING="rh"
-
-    while getopts "$OPTSTRING" name $args; do
-          if [[ ${OPTARG} ]]; then
-            options[${name}]=${OPTARG};
-          else
-            options[${name}]=${name};
-          fi
-    done;
-    shift $(( ${OPTIND} - 1 ));
     
-    while(($#)) ; do
-        import_file $1
-        shift
+    if [[ ${options["v"]} ]]; then
+        echo "Imported '$INPUT_FILE' as '$UUID'"
+    fi;
+}
+
+function import_directory {
+
+    local INPUT_FILE=${1}
+    
+    if [[ ! -d "$INPUT_FILE" ]];
+    then
+        echo "abow-import.sh: $INPUT_FILE: Directory not found" > /dev/stderr;
+        return;
+    fi;
+
+    for i in `find "$INPUT_FILE" -type f -name "*.txt"`; do
+        import_file "$i";
     done;
 }
 
-parse_args $@;
+function import_recursive {
+
+    local INPUT_FILE=${1}
+    
+    if [[ -f "$INPUT_FILE" ]]; then
+        import_file "$INPUT_FILE";
+    elif [[ -d "$INPUT_FILE" ]]; then
+        import_directory "$INPUT_FILE";
+    else
+        echo "abow-import.sh: $INPUT_FILE: File or directory not found" > /dev/stderr;
+        return;
+    fi;
+}
+
+args=${@}
+args=${args//--recursive/-r}
+args=${args//--verbose/-v}
+args=${args//--force/-f}
+args=${args//--help/-h} # TODO
+
+shopt -s extglob
+args=${args//--+([a-zA-Z0-9-])/-?}
+
+declare -A options;
+OPTSTRING="rvfh"
+
+while getopts "$OPTSTRING" name $args; do
+      if [[ ${OPTARG} ]]; then
+        options[${name}]=${OPTARG};
+      else
+        options[${name}]=${name};
+      fi;
+done;
+shift $(( ${OPTIND} - 1 ));
+
+while (( $# )) ; do
+
+    INPUT_FILE=${1}
+
+    if [[ ${options["r"]} ]]; then
+        import_recursive "$INPUT_FILE";
+    fi;
+
+    import_file "$INPUT_FILE";
+
+    shift;
+done;
 
