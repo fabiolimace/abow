@@ -46,7 +46,7 @@ function import_file {
     echo "uuid=$UUID" >> $META
     echo "path=$INPUT_FILE" >> $META
     echo "name=`basename $INPUT_FILE`" >> $META
-    echo "hash=`md5sum $INPUT_FILE | cut -c-32`" >> $META
+    echo "hash=`sha1sum $INPUT_FILE | cut -c-40`" >> $META
     echo "date=`date '+%F %T'`" >> $META
     echo "mime=`file -bi $INPUT_FILE`" >> $META
     echo "size=`wc -c $INPUT_FILE | cut -d" " -f1`" >> $META
