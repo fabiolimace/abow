@@ -19,7 +19,7 @@ function hash {
 
 function uuid {
     # Generate a UUIDv8 using the file hash. UUIDv8 is custom and free-form UUID
-    echo -n ${1} | awk '{ print substr($0, 1, 8) "-" substr($0, 9, 4) "-8" substr($0, 14, 3) "-8" substr($0, 18, 3) "-" substr($0, 21, 12) }'
+    printf "%s-%s-%s%s-%s%s-%s\n" ${1:0:8} ${1:8:4} '8' ${1:13:3} '8' ${1:17:3} ${1:20:12}
 }
 
 function import_file {
