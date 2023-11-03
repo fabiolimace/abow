@@ -63,24 +63,24 @@ Show a `data.tsv` file:
 abow --show --data SHORT_ID
 ```
 
-### Find files
+### Search in files
 
-Find a regex in a `text.txt` file:
+Search in `text.txt` files:
 
 ```bash
-abow --find REGEX
+abow --grep REGEX
 ```
 
-Find a regex in a `meta.txt` file:
+Search in `meta.txt` files:
 
 ```bash
-abow --find -meta REGEX
+abow --grep -meta REGEX
 ```
 
-Find a regex in a `data.tsv` file:
+Search in `data.tsv` files:
 
 ```bash
-abow --find -data REGEX
+abow --grep -data REGEX
 ```
 
 ### Import files

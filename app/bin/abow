@@ -15,10 +15,10 @@
 #    abow --show --collection COLLECTION --meta ID
 #    abow --show --collection COLLECTION --data ID
 #
-#    abow --find REGEX
-#    abow --find --collection COLLECTION REGEX
-#    abow --find --collection COLLECTION -m REGEX
-#    abow --find --collection COLLECTION -d REGEX
+#    abow --grep REGEX
+#    abow --grep --collection COLLECTION REGEX
+#    abow --grep --collection COLLECTION -m REGEX
+#    abow --grep --collection COLLECTION -d REGEX
 #
 #    abow --process FILE [...]
 #    abow --process FILE [...] > OUTPUT
@@ -41,8 +41,8 @@ args=${@}
 args=${args//--list/-l}
 # show
 args=${args//--show/-s}
-# find
-args=${args//--find/-f}
+# grep
+args=${args//--grep/-g}
 # process
 args=${args//--process/-p}
 args=${args//--output/-o}
@@ -61,7 +61,7 @@ shopt -s extglob # remove unknown
 args=${args//--+([a-zA-Z0-9-])/-?}
 
 declare -A options;
-OPTSTRING="lspoic:rvfmdh"
+OPTSTRING="lspoic:rvgmdh"
 
 while getopts "$OPTSTRING" name ${args}; do
 
@@ -77,8 +77,8 @@ if [[ ${options["l"]} ]]; then
     $BASEDIR/abow-list.sh ${args}
 elif [[ ${options["s"]} ]]; then
     $BASEDIR/abow-show.sh ${args}
-elif [[ ${options["f"]} ]]; then
-    $BASEDIR/abow-find.sh ${args}
+elif [[ ${options["g"]} ]]; then
+    $BASEDIR/abow-grep.sh ${args}
 elif [[ ${options["p"]} ]]; then
     $BASEDIR/abow-process.sh ${args}
 elif [[ "${options["i"]}" ]]; then
