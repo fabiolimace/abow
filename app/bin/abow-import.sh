@@ -43,7 +43,7 @@ function import_file {
     
     if [[ -d $ITEM && ! ${options["f"]} ]];
     then
-        echo "abow-import.sh: $INPUT_FILE: Fire already imported as '$SUID'" >> /dev/stderr;
+        echo "abow-import.sh: $INPUT_FILE: Fire already imported to '$COLLECTION/$SUID/'" >> /dev/stderr;
         return;
     fi;
     
