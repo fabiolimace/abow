@@ -4,6 +4,27 @@ ABoW stands for Awk Bag of Words.
 
 ## Usage
 
+### Process files
+
+Process files to /dev/stdout:
+
+```bash
+app/bin/abow --process FILE [...]
+```
+
+Process files to an output file:
+
+```bash
+app/bin/abow --process --output OUTPUT FILE [...]
+```
+
+Where:
+
+*   `FILE`: is a plain text file, optionally with a ".txt" suffix.
+*   `OUTPUT`: is a tab-separated value file, optionally with a ".tsv" suffix.
+
+### Import files
+
 Import files:
 
 ```bash
@@ -34,7 +55,29 @@ A single command can import one or more files or directories at once.
 
 If a file exists, an error message is written to `/dev/stderr` related to that file. You can force to import files again using the `--force` option.
 
-## Data structure
+## `data.tsv` file structure
+
+The `data.tsv` file is a tab-separated value file containing the generated the bag of words.
+
+Fields:
+
+*   `TOKEN`: is a word, a punctuation symbol or an `<EOL>`.
+*   `COUNT`: is the number of occurencies of the token in the text.
+*   `RATIO`: is the COUNT divided by the sum occurrencies of all tokens in the text.
+*   `CLASS`: is one of these POSIX character classes: 'A' for `[:alpha:]`, 'D' for `[:digit:]`, 'P' for `[:punct:]`, and 'NA' for none.
+*   `CASE`: is one of these letter cases: 'L' for lower case, 'U' for upper case, 'C' for capitalized word, and 'NA' for none.
+*   `LENGTH`: is the number of characters in the token.
+*   `INDEXES`: is the list of all positions of the token in the text separated by commas.
+
+Where:
+
+*   `<EOL>`: is a symbol for the end of line.
+
+If a token has only 1 character and this character is an uppercase letter, then this token is treated as a capitalized word; for example, the word "É" is a capitalized word.
+
+No quotes are used in the output file to separate fields, despite Github's complaints about ["unclosed quoted fields"](https://docs.github.com/pt/repositories/working-with-files/using-files/working-with-non-code-files). Only end of lines (\n) and tabs (\t) are are utilized to separate records and fields, respectively. To learn why I choose TSV over CSV format, read this comparision between the two: https://github.com/eBay/tsv-utils/blob/master/docs/comparing-tsv-and-csv.md.
+
+## `data` directory structure
 
 The imported files are stored in the `data` folder.
 

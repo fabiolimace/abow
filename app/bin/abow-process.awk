@@ -4,7 +4,7 @@
 #   * Files encoded using MAC-UTF-8 must be normalized to UTF-8.
 #   * Non-breakin spaces (NBSP, 0xA0) must be converted to regular spaces.
 
-function kind(token)
+function character_class(token)
 {
     switch (token) {
     case /^[[:alpha:]-]+$/:
@@ -22,7 +22,7 @@ function kind(token)
     # with MAC-UTF-8. You must normilize the input files to regular UTF-8 encoding.
 }
 
-function style(token)
+function letter_case(token)
 {
     switch (token) {
     case /^[[:lower:]]+(-([[:lower:]]+|[[:upper:]]+|[[:alpha:]][[:lower:]]+))*$/:
@@ -37,7 +37,7 @@ function style(token)
     
     # NOTE:
     # UPPERCASE words with a single character, for example "É", are treated as Capitalized words by this function.
-    # The author considers it a very convenient behavior that helps to identify proper nouns and the beginning of 
+    # The author considers it a very convenient behavior that helps to identify proper nouns and the beginning of
     # sentences, although he admits that it may not be intuitive. The order of the switch cases is important to
     # preserve this behavior.
 }
@@ -90,7 +90,7 @@ BEGIN {
                 split(token, puncts, //);
                 for (p in puncts) {
                     insert(puncts[p]);
-                }                
+                }
             } else {
                 insert(token);
             }
@@ -116,12 +116,12 @@ END {
     }
     # end of operational checks #
 
-    print "TOKEN\tCOUNT\tRATIO\tKIND\tSTYLE\tLENGH\tINDEXES"
+    print "TOKEN\tCOUNT\tRATIO\tCLASS\tCASE\tLENGTH\tINDEXES"
     
     for (token in counters) {
         count = counters[token];
         ratio = counters[token] / total;
-        printf "%s\t%d\t%.9f\t%s\t%s\t%d\t%s\n", token, count, ratio, kind(token), style(token), length(token), join(indexes[token]);
+        printf "%s\t%d\t%.9f\t%s\t%s\t%d\t%s\n", token, count, ratio, character_class(token), letter_case(token), length(token), join(indexes[token]);
     }
 }
 

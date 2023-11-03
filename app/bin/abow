@@ -1,0 +1,64 @@
+#!/bin/bash
+#
+# This is the main `abow` program.
+#
+# It is a wrapper for the other tools.
+#
+# Usage:
+#
+#    abow --process FILE [...]
+#    abow --process FILE [...] > OUTPUT
+#    abow --process -output OUTPUT FILE [...]
+#
+#    abow --import FILE [...]
+#    abow --import -recursive DIRECTORY [...]
+#    abow --import -recursive --collection COLLECTION DIRECTORY [...]
+#
+
+BASEDIR=`dirname $0`
+
+args=${@}
+args=${args//--process/-p}
+args=${args//--import/-i}
+args=${args//--help/-h} # TODO
+
+args=${@}
+# process
+args=${args//--process/-p}
+args=${args//--output/-o}
+# import
+args=${args//--import/-i}
+args=${args//--collection/-c}
+args=${args//--recursive/-r}
+# generic
+args=${args//--verbose/-v}
+args=${args//--force/-f}
+args=${args//--tags/-t} # TODO
+args=${args//--meta/-m} # TODO
+args=${args//--help/-h} # TODO
+
+shopt -s extglob # remove unknown
+args=${args//--+([a-zA-Z0-9-])/-?}
+
+declare -A options;
+OPTSTRING="poic:rvfh"
+
+while getopts "$OPTSTRING" name ${args}; do
+
+      if [[ ${OPTARG} ]]; then
+        options[${name}]=${OPTARG};
+      else
+        options[${name}]=${name};
+      fi;
+done;
+shift $(( ${OPTIND} - 1 ));
+
+if [[ ${options["p"]} ]]; then
+    $BASEDIR/abow-process.sh ${args}
+elif [[ "${options["i"]}" ]]; then
+    $BASEDIR/abow-import.sh ${args}
+else
+    echo "abow: missing or invalid arguments";
+    exit 1;
+fi;
+

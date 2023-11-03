@@ -4,6 +4,7 @@
 #
 #    abow-import INPUT_FILE [FILE...]
 #    abow-import -r DIRECTORY [DIRECTORY...]
+#    abow-import -r -c COLLECTION DIRECTORY [...]
 #
 
 BASEDIR=`dirname $0`
@@ -16,7 +17,7 @@ function import_file {
     
     if [[ ! -f "$INPUT_FILE" ]];
     then
-        echo "abow-import.sh: $INPUT_FILE: File not found" > /dev/stderr;
+        echo "abow-import.sh: $INPUT_FILE: File not found" >> /dev/stderr;
         return;
     fi;
     
@@ -27,9 +28,9 @@ function import_file {
     local META=$ITEM/meta.txt
     local DATA=$ITEM/data.tsv
     
-    if [[ ! ${options["f"]} && -d $ITEM ]];
+    if [[ -d $ITEM && ! ${options["f"]} ]];
     then
-        echo "abow-import.sh: $INPUT_FILE: Already imported" > /dev/stderr;
+        echo "abow-import.sh: $INPUT_FILE: Fire already imported" >> /dev/stderr;
         return;
     fi;
     
@@ -46,7 +47,7 @@ function import_file {
     echo "mime=`file -bi $INPUT_FILE`" >> $META
     echo "size=`wc -c $INPUT_FILE | cut -d" " -f1`" >> $META
    
-    $BASEDIR/abow-compute.sh $TEXT $DATA
+    $BASEDIR/abow-process.sh -o $DATA $TEXT
     
     if [[ ${options["v"]} ]]; then
         echo "Imported '$INPUT_FILE' to '$COLLECTION/$SUID/'"
@@ -60,7 +61,7 @@ function import_directory {
     
     if [[ ! -d "$INPUT_FILE" ]];
     then
-        echo "abow-import.sh: $INPUT_FILE: Directory not found" > /dev/stderr;
+        echo "abow-import.sh: $INPUT_FILE: Directory not found" >> /dev/stderr;
         return;
     fi;
 
@@ -79,27 +80,15 @@ function import_recursive {
     elif [[ -d "$INPUT_FILE" ]]; then
         import_directory "$COLLECTION" "$INPUT_FILE";
     else
-        echo "abow-import.sh: $INPUT_FILE: File or directory not found" > /dev/stderr;
+        echo "abow-import.sh: $INPUT_FILE: File or directory not found" >> /dev/stderr;
         return;
     fi;
 }
 
-args=${@}
-args=${args//--collection/-c}
-args=${args//--recursive/-r}
-args=${args//--verbose/-v}
-args=${args//--force/-f}
-args=${args//--tags/-t} # TODO
-args=${args//--meta/-m} # TODO
-args=${args//--help/-h} # TODO
-
-shopt -s extglob
-args=${args//--+([a-zA-Z0-9-])/-?}
-
 declare -A options;
-OPTSTRING="c:rvfh"
+OPTSTRING="ic:rvfh"
 
-while getopts "$OPTSTRING" name $args; do
+while getopts "$OPTSTRING" name ${@}; do
       if [[ ${OPTARG} ]]; then
         options[${name}]=${OPTARG};
       else
