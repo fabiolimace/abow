@@ -107,7 +107,7 @@ while (( $# )) ; do
     COLLECTION=${options["c"]:=default}
 
     if [[ ${options["r"]} ]]; then
-        import_recursive "$INPUT_FILE";
+        import_recursive "$COLLECTION" "$INPUT_FILE";
     fi;
 
     import_file "$COLLECTION" "$INPUT_FILE";
