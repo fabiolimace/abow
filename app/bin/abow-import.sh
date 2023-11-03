@@ -14,7 +14,7 @@ DATADIR="$BASEDIR/../data"
 NAMESPACE="33333333-3333-3333-3333-333333333333";
 
 function hash {
-    sha1sum ${1} | cut -c-40
+    sha1sum ${1} | head -c 40
 }
 
 function uuid {
