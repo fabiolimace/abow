@@ -1,0 +1,9 @@
+collection=default
+suid=55a5341b
+uuid=55a5341b-36b0-3d39-a8d9-b034af085074
+path=samples/sample1.txt
+name=sample1.txt
+hash=b140c68f93a8ff7c9939ab99e5a8f5bd1743f47c
+date=2023-11-03 16:44:28
+mime=text/plain; charset=utf-8
+size=2050
