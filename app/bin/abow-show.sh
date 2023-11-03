@@ -2,10 +2,10 @@
 #
 # Usage:
 #
-#    abow-show ID
-#    abow-show -c COLLECTION ID
-#    abow-show -c COLLECTION -m ID
-#    abow-show -c COLLECTION -d ID
+#    abow-show SUID
+#    abow-show -c COLLECTION SUID
+#    abow-show -c COLLECTION -m SUID
+#    abow-show -c COLLECTION -d SUID
 #
 
 BASEDIR=`dirname $0`

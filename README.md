@@ -48,19 +48,19 @@ abow --list --collection COLLECTION --meta "suid,collection,name,size,date"
 Show a `text.txt` file:
 
 ```bash
-abow --show ID
+abow --show SHORT_ID
 ```
 
 Show a `meta.txt` file:
 
 ```bash
-abow --show --meta ID
+abow --show --meta SHORT_ID
 ```
 
 Show a `data.tsv` file:
 
 ```bash
-abow --show --data ID
+abow --show --data SHORT_ID
 ```
 
 ### Find files
@@ -171,10 +171,9 @@ And where:
 
 *   `default`: is the a collection name.
 *   `25cc123e`: is a short ID to derived from the file's UUIDv3.
-*   `25cc123e-66c5-35ac-8b32-bc8ef803abdf`: is a UUIDv3 derived from the original file path.
+*   `25cc123e-66c5-35ac-8b32-bc8ef803abdf`: is a UUIDv3 derived from the original file content.
 
 The short ID is just an abbreviated form of the UUIDv3. It is not meant to be globally unique, not even in the a collection scope.
 
-The UUIDv3 is calculated using the original file path and the URL namespace specified by the RFC-4122. Note that the UUIDv3 will be different if the same file is imported again with a different name or from a different folder.
-
+The UUIDv3 is calculated using the original file content and the custom namespace "33333333-3333-3333-3333-333333333333".
 
