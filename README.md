@@ -9,13 +9,13 @@ ABoW stands for Awk Bag of Words.
 Process files to /dev/stdout:
 
 ```bash
-app/bin/abow --process FILE [...]
+abow --process FILE [...]
 ```
 
 Process files to an output file:
 
 ```bash
-app/bin/abow --process --output OUTPUT FILE [...]
+abow --process --output OUTPUT FILE [...]
 ```
 
 Where:
@@ -28,19 +28,19 @@ Where:
 List all files:
 
 ```bash
-app/bin/abow --list
+abow --list
 ```
 
 List files of a collection:
 
 ```bash
-app/bin/abow --list COLLECTION
+abow --list COLLECTION
 ```
 
 List files of a collection selecting the metadata fields:
 
 ```bash
-app/bin/abow --list COLLECTION --meta "suid,collection,name,size,date"
+abow --list COLLECTION --meta "suid,collection,name,size,date"
 ```
 
 ### Show files
@@ -48,19 +48,19 @@ app/bin/abow --list COLLECTION --meta "suid,collection,name,size,date"
 Show a `text.txt` file:
 
 ```bash
-app/bin/abow --show ID
+abow --show ID
 ```
 
 Show a `meta.txt` file:
 
 ```bash
-app/bin/abow --show --meta ID
+abow --show --meta ID
 ```
 
 Show a `data.tsv` file:
 
 ```bash
-app/bin/abow --show --data ID
+abow --show --data ID
 ```
 
 ### Find files
@@ -68,19 +68,19 @@ app/bin/abow --show --data ID
 Find a regex in a `text.txt` file:
 
 ```bash
-app/bin/abow --find REGEX
+abow --find REGEX
 ```
 
 Find a regex in a `meta.txt` file:
 
 ```bash
-app/bin/abow --find -meta REGEX
+abow --find -meta REGEX
 ```
 
 Find a regex in a `data.tsv` file:
 
 ```bash
-app/bin/abow --find -data REGEX
+abow --find -data REGEX
 ```
 
 ### Import files
@@ -88,19 +88,19 @@ app/bin/abow --find -data REGEX
 Import files:
 
 ```bash
-app/bin/abow-import.sh FILE [...]
+abow-import.sh FILE [...]
 ```
 
 Import files recursivelly:
 
 ```bash
-app/bin/abow-import.sh --recursive DIRECTORY [...]
+abow-import.sh --recursive DIRECTORY [...]
 ```
 
 Import files recursivelly to a collection:
 
 ```bash
-app/bin/abow-import.sh --recursive --collection COLLECTION DIRECTORY [...]
+abow-import.sh --recursive --collection COLLECTION DIRECTORY [...]
 ```
 
 Where:
