@@ -10,6 +10,9 @@
 BASEDIR=`dirname $0`
 DATADIR="$BASEDIR/../data"
 
+# Equivalent to ASCII string: "3333333333333333"
+NAMESPACE="33333333-3333-3333-3333-333333333333";
+
 function import_file {
 
     local COLLECTION=${1}
@@ -21,7 +24,7 @@ function import_file {
         return;
     fi;
     
-    local UUID=` uuidgen --md5 --namespace @url --name "$INPUT_FILE"`
+    local UUID=` uuidgen --md5 --namespace $NAMESPACE --name "$(cat $INPUT_FILE)"`
     local SUID=`echo $UUID | cut -d- -f1`
     local ITEM=$DATADIR/$COLLECTION/$SUID/$UUID;
     local TEXT=$ITEM/text.txt
