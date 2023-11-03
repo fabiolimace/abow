@@ -6,18 +6,23 @@
 #
 # Usage:
 #
+#    abow -list
+#    abow -list COLLECTION
+#    abow -list --meta "hash,name" COLLECTION
+#
+#    abow --show ID
+#    abow --show --collection COLLECTION ID
+#    abow --show --collection COLLECTION --meta ID
+#    abow --show --collection COLLECTION --data ID
+#
+#    abow --find REGEX
+#    abow --find --collection COLLECTION REGEX
+#    abow --find --collection COLLECTION -m REGEX
+#    abow --find --collection COLLECTION -d REGEX
+#
 #    abow --process FILE [...]
 #    abow --process FILE [...] > OUTPUT
 #    abow --process -output OUTPUT FILE [...]
-#
-#    abow --list
-#    abow --list --meta "hash,name"
-#    abow --list --collection COLLECTION
-#
-#    abow --show SUID
-#    abow --show --text SUID
-#    abow --show --meta SUID
-#    abow --show --meta "hash,name" SUID
 #
 #    abow --import FILE [...]
 #    abow --import -recursive DIRECTORY [...]
@@ -34,6 +39,10 @@ args=${args//--help/-h} # TODO
 args=${@}
 # list
 args=${args//--list/-l}
+# show
+args=${args//--show/-s}
+# find
+args=${args//--find/-f}
 # process
 args=${args//--process/-p}
 args=${args//--output/-o}
@@ -45,13 +54,14 @@ args=${args//--collection/-c}
 args=${args//--verbose/-v}
 args=${args//--force/-f}
 args=${args//--meta/-m}
+args=${args//--data/-d}
 args=${args//--help/-h} # TODO
 
 shopt -s extglob # remove unknown
 args=${args//--+([a-zA-Z0-9-])/-?}
 
 declare -A options;
-OPTSTRING="lpoic:rvfmh"
+OPTSTRING="lspoic:rvfmdh"
 
 while getopts "$OPTSTRING" name ${args}; do
 
@@ -65,6 +75,10 @@ shift $(( ${OPTIND} - 1 ));
 
 if [[ ${options["l"]} ]]; then
     $BASEDIR/abow-list.sh ${args}
+elif [[ ${options["s"]} ]]; then
+    $BASEDIR/abow-show.sh ${args}
+elif [[ ${options["f"]} ]]; then
+    $BASEDIR/abow-find.sh ${args}
 elif [[ ${options["p"]} ]]; then
     $BASEDIR/abow-process.sh ${args}
 elif [[ "${options["i"]}" ]]; then
