@@ -171,9 +171,7 @@ And where:
 
 *   `default`: is the a collection name.
 *   `25cc123e`: is a short ID to derived from the file's UUIDv3.
-*   `25cc123e-66c5-35ac-8b32-bc8ef803abdf`: is a UUIDv3 derived from the original file content.
+*   `25cc123e-66c5-35ac-8b32-bc8ef803abdf`: is a UUIDv8 derived from the original file content.
 
-The short ID is just an abbreviated form of the UUIDv3. It is not meant to be globally unique, not even in the a collection scope.
-
-The UUIDv3 is calculated using the original file content and the custom namespace "33333333-3333-3333-3333-333333333333".
+The short ID is just an abbreviated form of the UUIDv8. It is not meant to be globally unique, not even in the a collection scope.
 

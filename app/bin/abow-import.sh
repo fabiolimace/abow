@@ -118,9 +118,9 @@ while (( $# )) ; do
 
     if [[ ${options["r"]} ]]; then
         import_recursive "$COLLECTION" "$INPUT_FILE";
+    else
+        import_file "$COLLECTION" "$INPUT_FILE";
     fi;
-
-    import_file "$COLLECTION" "$INPUT_FILE";
 
     shift;
 done;
