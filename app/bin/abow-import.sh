@@ -39,6 +39,7 @@ function import_file {
     cp $INPUT_FILE $TEXT
     
     echo "collection=$COLLECTION" > $META
+    echo "suid=$SUID" >> $META
     echo "uuid=$UUID" >> $META
     echo "path=$INPUT_FILE" >> $META
     echo "name=`basename $INPUT_FILE`" >> $META
@@ -47,7 +48,7 @@ function import_file {
     echo "mime=`file -bi $INPUT_FILE`" >> $META
     echo "size=`wc -c $INPUT_FILE | cut -d" " -f1`" >> $META
    
-    $BASEDIR/abow-process.sh -o $DATA $TEXT
+    $BASEDIR/abow-process.sh -f -o $DATA $TEXT
     
     if [[ ${options["v"]} ]]; then
         echo "Imported '$INPUT_FILE' to '$COLLECTION/$SUID/'"

@@ -23,6 +23,26 @@ Where:
 *   `FILE`: is a plain text file, optionally with a ".txt" suffix.
 *   `OUTPUT`: is a tab-separated value file, optionally with a ".tsv" suffix.
 
+### List files
+
+List all files:
+
+```bash
+app/bin/abow --list
+```
+
+List files from a collection:
+
+```bash
+app/bin/abow --list --collection COLLECTION
+```
+
+List files choosing the metadata fields:
+
+```bash
+app/bin/abow --meta "suid,collection,name,size,date"
+```
+
 ### Import files
 
 Import files:

@@ -10,6 +10,15 @@
 #    abow --process FILE [...] > OUTPUT
 #    abow --process -output OUTPUT FILE [...]
 #
+#    abow --list
+#    abow --list --meta "hash,name"
+#    abow --list --collection COLLECTION
+#
+#    abow --show SUID
+#    abow --show --text SUID
+#    abow --show --meta SUID
+#    abow --show --meta "hash,name" SUID
+#
 #    abow --import FILE [...]
 #    abow --import -recursive DIRECTORY [...]
 #    abow --import -recursive --collection COLLECTION DIRECTORY [...]
@@ -23,25 +32,26 @@ args=${args//--import/-i}
 args=${args//--help/-h} # TODO
 
 args=${@}
+# list
+args=${args//--list/-l}
 # process
 args=${args//--process/-p}
 args=${args//--output/-o}
 # import
 args=${args//--import/-i}
-args=${args//--collection/-c}
 args=${args//--recursive/-r}
 # generic
+args=${args//--collection/-c}
 args=${args//--verbose/-v}
 args=${args//--force/-f}
-args=${args//--tags/-t} # TODO
-args=${args//--meta/-m} # TODO
+args=${args//--meta/-m}
 args=${args//--help/-h} # TODO
 
 shopt -s extglob # remove unknown
 args=${args//--+([a-zA-Z0-9-])/-?}
 
 declare -A options;
-OPTSTRING="poic:rvfh"
+OPTSTRING="lpoic:rvfmh"
 
 while getopts "$OPTSTRING" name ${args}; do
 
@@ -53,7 +63,9 @@ while getopts "$OPTSTRING" name ${args}; do
 done;
 shift $(( ${OPTIND} - 1 ));
 
-if [[ ${options["p"]} ]]; then
+if [[ ${options["l"]} ]]; then
+    $BASEDIR/abow-list.sh ${args}
+elif [[ ${options["p"]} ]]; then
     $BASEDIR/abow-process.sh ${args}
 elif [[ "${options["i"]}" ]]; then
     $BASEDIR/abow-import.sh ${args}
