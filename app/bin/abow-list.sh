@@ -2,9 +2,9 @@
 #
 # Usage:
 #
-#    abow --list
-#    abow -c COLLECTION
-#    abow -c COLLECTION -m "hash,name"
+#    abow-list
+#    abow-list -c COLLECTION
+#    abow-list -c COLLECTION -m "hash,name"
 #
 
 BASEDIR=`dirname $0`
@@ -22,17 +22,22 @@ while getopts "$OPTSTRING" name ${@}; do
 done;
 shift $(( ${OPTIND} - 1 ));
 
-COLLECTION="${options["c"]}"
+COLLECTION="${options["c"]:-default}";
 METAFIELDS="${options["m"]:=suid,collection,name,size,date}"
 
 declare -A meta;
 declare -A size;
 
-for subdir in `find "$DATADIR/" -mindepth 1 -maxdepth 1 -type d | sort `; do
+if [[ ! -d "$DATADIR/$COLLECTION" ]]; then
+    echo "abow-list.sh: $COLLECTION: Collection not found" >> /dev/stderr;
+    exit 1;
+fi;
 
-    test "`basename $subdir`" == "${COLLECTION:-`basename $subdir`}" || continue;
+for collection_dir in `find "$DATADIR/" -mindepth 1 -maxdepth 1 -type d | sort `; do
 
-    for i in `find "$subdir" -type f -name "meta.txt"`; do
+    test "`basename $collection_dir`" == "${COLLECTION:-`basename $collection_dir`}" || continue;
+
+    for i in `find "$collection_dir" -type f -name "meta.txt"`; do
 
         while read -r line; do
         
