@@ -31,16 +31,56 @@ List all files:
 app/bin/abow --list
 ```
 
-List files from a collection:
+List files of a collection:
 
 ```bash
-app/bin/abow --list --collection COLLECTION
+app/bin/abow --list COLLECTION
 ```
 
-List files choosing the metadata fields:
+List files of a collection selecting the metadata fields:
 
 ```bash
-app/bin/abow --meta "suid,collection,name,size,date"
+app/bin/abow --list COLLECTION --meta "suid,collection,name,size,date"
+```
+
+### Show files
+
+Show a `text.txt` file:
+
+```bash
+app/bin/abow --show ID
+```
+
+Show a `meta.txt` file:
+
+```bash
+app/bin/abow --show --meta ID
+```
+
+Show a `data.tsv` file:
+
+```bash
+app/bin/abow --show --data ID
+```
+
+### Find files
+
+Find a regex in a `text.txt` file:
+
+```bash
+app/bin/abow --find REGEX
+```
+
+Find a regex in a `meta.txt` file:
+
+```bash
+app/bin/abow --find -meta REGEX
+```
+
+Find a regex in a `data.tsv` file:
+
+```bash
+app/bin/abow --find -data REGEX
 ```
 
 ### Import files
