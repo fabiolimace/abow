@@ -7,11 +7,12 @@
 #
 
 BASEDIR=`dirname $0`
-DATABASE="$BASEDIR/../database"
+DATADIR="$BASEDIR/../data"
 
 function import_file {
 
-    local INPUT_FILE=${1}
+    local COLLECTION=${1}
+    local INPUT_FILE=${2}
     
     if [[ ! -f "$INPUT_FILE" ]];
     then
@@ -21,7 +22,7 @@ function import_file {
     
     local UUID=` uuidgen --md5 --namespace @url --name "$INPUT_FILE"`
     local SUID=`echo $UUID | cut -d- -f1`
-    local ITEM=$DATABASE/$SUID/$UUID;
+    local ITEM=$DATADIR/$COLLECTION/$SUID/$UUID;
     local TEXT=$ITEM/text.txt
     local META=$ITEM/meta.txt
     local DATA=$ITEM/data.tsv
@@ -36,9 +37,10 @@ function import_file {
     
     cp $INPUT_FILE $TEXT
     
+    echo "collection=$COLLECTION" > $META
     echo "uuid=$UUID" >> $META
+    echo "path=$INPUT_FILE" >> $META
     echo "name=`basename $INPUT_FILE`" >> $META
-    echo "path=`dirname $INPUT_FILE`" >> $META
     echo "hash=`md5sum $INPUT_FILE | cut -c-32`" >> $META
     echo "date=`date '+%F %T'`" >> $META
     echo "mime=`file -bi $INPUT_FILE`" >> $META
@@ -47,13 +49,14 @@ function import_file {
     $BASEDIR/abow-compute.sh $TEXT $DATA
     
     if [[ ${options["v"]} ]]; then
-        echo "Imported '$INPUT_FILE' as '$UUID'"
+        echo "Imported '$INPUT_FILE' to '$COLLECTION/$SUID/'"
     fi;
 }
 
 function import_directory {
 
-    local INPUT_FILE=${1}
+    local COLLECTION=${1}
+    local INPUT_FILE=${2}
     
     if [[ ! -d "$INPUT_FILE" ]];
     then
@@ -62,18 +65,19 @@ function import_directory {
     fi;
 
     for i in `find "$INPUT_FILE" -type f -name "*.txt"`; do
-        import_file "$i";
+        import_file "$COLLECTION" "$i";
     done;
 }
 
 function import_recursive {
 
-    local INPUT_FILE=${1}
+    local COLLECTION=${1}
+    local INPUT_FILE=${2}
     
     if [[ -f "$INPUT_FILE" ]]; then
-        import_file "$INPUT_FILE";
+        import_file "$COLLECTION" "$INPUT_FILE";
     elif [[ -d "$INPUT_FILE" ]]; then
-        import_directory "$INPUT_FILE";
+        import_directory "$COLLECTION" "$INPUT_FILE";
     else
         echo "abow-import.sh: $INPUT_FILE: File or directory not found" > /dev/stderr;
         return;
@@ -81,16 +85,19 @@ function import_recursive {
 }
 
 args=${@}
+args=${args//--collection/-c}
 args=${args//--recursive/-r}
 args=${args//--verbose/-v}
 args=${args//--force/-f}
+args=${args//--tags/-t} # TODO
+args=${args//--meta/-m} # TODO
 args=${args//--help/-h} # TODO
 
 shopt -s extglob
 args=${args//--+([a-zA-Z0-9-])/-?}
 
 declare -A options;
-OPTSTRING="rvfh"
+OPTSTRING="c:rvfh"
 
 while getopts "$OPTSTRING" name $args; do
       if [[ ${OPTARG} ]]; then
@@ -104,12 +111,13 @@ shift $(( ${OPTIND} - 1 ));
 while (( $# )) ; do
 
     INPUT_FILE=${1}
+    COLLECTION=${options["c"]:=default}
 
     if [[ ${options["r"]} ]]; then
         import_recursive "$INPUT_FILE";
     fi;
 
-    import_file "$INPUT_FILE";
+    import_file "$COLLECTION" "$INPUT_FILE";
 
     shift;
 done;
