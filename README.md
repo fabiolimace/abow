@@ -34,13 +34,13 @@ abow --list
 List files of a collection:
 
 ```bash
-abow --list COLLECTION
+abow --list --collection COLLECTION
 ```
 
 List files of a collection selecting the metadata fields:
 
 ```bash
-abow --list COLLECTION --meta "suid,collection,name,size,date"
+abow --list --collection COLLECTION --meta "suid,collection,name,size,date"
 ```
 
 ### Show files
