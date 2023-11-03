@@ -13,6 +13,15 @@ DATADIR="$BASEDIR/../data"
 # Equivalent to ASCII string: "3333333333333333"
 NAMESPACE="33333333-3333-3333-3333-333333333333";
 
+function hash {
+    sha1sum ${1} | cut -c-40
+}
+
+function uuid {
+    # Generate a UUIDv8 using the file hash. UUIDv8 is custom and free-form UUID
+    echo -n ${1} | awk '{ print substr($0, 1, 8) "-" substr($0, 9, 4) "-8" substr($0, 14, 3) "-8" substr($0, 18, 3) "-" substr($0, 21, 12) }'
+}
+
 function import_file {
 
     local COLLECTION=${1}
@@ -24,7 +33,8 @@ function import_file {
         return;
     fi;
     
-    local UUID=` uuidgen --md5 --namespace $NAMESPACE --name "$(cat $INPUT_FILE)"`
+    local HASH=`hash "$INPUT_FILE"`
+    local UUID=`uuid "$HASH"`
     local SUID=`echo $UUID | cut -d- -f1`
     local ITEM=$DATADIR/$COLLECTION/$SUID/$UUID;
     local TEXT=$ITEM/text.txt
@@ -46,7 +56,7 @@ function import_file {
     echo "uuid=$UUID" >> $META
     echo "path=$INPUT_FILE" >> $META
     echo "name=`basename $INPUT_FILE`" >> $META
-    echo "hash=`sha1sum $INPUT_FILE | cut -c-40`" >> $META
+    echo "hash=$HASH" >> $META
     echo "date=`date '+%F %T'`" >> $META
     echo "mime=`file -bi $INPUT_FILE`" >> $META
     echo "size=`wc -c $INPUT_FILE | cut -d" " -f1`" >> $META
