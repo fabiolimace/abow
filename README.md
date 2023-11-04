@@ -8,8 +8,11 @@ Usage
 
 ### Process files
 
-Process files to /dev/stdout:
+Process files to the standard output:
 
+```bash
+abow -p FILE [...]
+```
 ```bash
 abow --process FILE [...]
 ```
@@ -17,18 +20,24 @@ abow --process FILE [...]
 Process files to an output file:
 
 ```bash
+abow -p -o OUTPUT FILE [...]
+```
+```bash
 abow --process --output OUTPUT FILE [...]
 ```
 
 Where:
 
-*   `FILE`: is a plain text file, optionally with a ".txt" suffix.
-*   `OUTPUT`: is a tab-separated value file, optionally with a ".tsv" suffix.
+*   `FILE`: is a plain text file.
+*   `OUTPUT`: is a tab-separated value file.
 
 ### List files
 
 List files:
 
+```bash
+abow -l
+```
 ```bash
 abow --list
 ```
@@ -36,11 +45,17 @@ abow --list
 List files of a collection:
 
 ```bash
+abow -l -c COLLECTION
+```
+```bash
 abow --list --collection COLLECTION
 ```
 
 List files of a collection selecting some metadata fields:
 
+```bash
+abow -l -c COLLECTION -m "suid,collection,name,size,date"
+```
 ```bash
 abow --list --collection COLLECTION --meta "suid,collection,name,size,date"
 ```
@@ -50,17 +65,26 @@ abow --list --collection COLLECTION --meta "suid,collection,name,size,date"
 Show a `text.txt` file:
 
 ```bash
+abow -s SHORT_ID
+```
+```bash
 abow --show SHORT_ID
 ```
 
 Show a `meta.txt` file:
 
 ```bash
+abow -s -m SHORT_ID
+```
+```bash
 abow --show --meta SHORT_ID
 ```
 
 Show a `data.tsv` file:
 
+```bash
+abow -s -d SHORT_ID
+```
 ```bash
 abow --show --data SHORT_ID
 ```
@@ -70,17 +94,26 @@ abow --show --data SHORT_ID
 Search in `text.txt` files using a regex:
 
 ```bash
+abow -g REGEX
+```
+```bash
 abow --grep REGEX
 ```
 
 Search in `meta.txt` files using a regex:
 
 ```bash
-abow --grep -meta REGEX
+abow -g -m REGEX
+```
+```bash
+abow --grep --meta REGEX
 ```
 
 Search in `data.tsv` files using a regex:
 
+```bash
+abow -g -d REGEX
+```
 ```bash
 abow --grep -data REGEX
 ```
@@ -90,11 +123,17 @@ abow --grep -data REGEX
 Import files:
 
 ```bash
+abow -i FILE [...]
+```
+```bash
 abow --import FILE [...]
 ```
 
 Import files recursivelly:
 
+```bash
+abow -i -r DIRECTORY [...]
+```
 ```bash
 abow --import --recursive DIRECTORY [...]
 ```
@@ -102,12 +141,15 @@ abow --import --recursive DIRECTORY [...]
 Import files recursivelly into a collection:
 
 ```bash
+abow -i -r -c COLLECTION DIRECTORY [...]
+```
+```bash
 abow --import --recursive --collection COLLECTION DIRECTORY [...]
 ```
 
 Where:
 
-*   `FILE`: is a plain text file, optionally with a ".txt" suffix.
+*   `FILE`: is a plain text file.
 *   `DIRECTORY`: is a directory containing files with ".txt" suffix.
 *   `COLLECTION`: is an arbitrary name for groups of imported files.
 
@@ -150,11 +192,11 @@ Where:
 
 And where:
 
-*   `default`: is the a collection name.
-*   `25cc123e`: is a short ID to derived from the file's UUIDv3.
+*   `default`: is the default collection name.
+*   `25cc123e`: is a short ID to derived from the file's UUIDv8.
 *   `25cc123e-66c5-35ac-8b32-bc8ef803abdf`: is a UUIDv8 derived from the file content.
 
-The short ID is just an abbreviated form of the UUIDv8. It is not meant to be globally unique, not even in the a collection scope.
+The short ID is just an abbreviated form of the UUIDv8. It is not meant to be globally unique, not even in a collection scope.
 
 The `data.tsv` file
 ------------------------------------------------------
@@ -165,9 +207,9 @@ Fields:
 
 *   `TOKEN`: is a word, a punctuation symbol or a `<EOL>` symbol.
 *   `COUNT`: is the number of occurencies of the token in the text.
-*   `RATIO`: is the COUNT divided by the sum of all tokens in the text.
-*   `CLASS`: is a POSIX character classes: 'A' for `[:alpha:]`, 'D' for `[:digit:]`, 'P' for `[:punct:]`, and 'NA'.
-*   `CASE`: is one of these letter cases: 'L' for lowercase, 'U' for uppercase, 'C' for capitalized word, and 'NA'.
+*   `RATIO`: is the COUNT divided by the number of all tokens in the text.
+*   `CLASS`: is a POSIX character classes: 'A' for `[:alpha:]`, 'D' for `[:digit:]`, 'P' for `[:punct:]`, and 'NA' for none.
+*   `CASE`: is one of these letter cases: 'L' for lowercase, 'U' for uppercase, 'C' for capitalized word, and 'NA' for none.
 *   `LENGTH`: is the number of characters in the token.
 *   `INDEXES`: is the comma-separated list of all positions of a token in the text.
 
@@ -176,7 +218,7 @@ Where:
 *   `<EOL>`: is a symbol for the end of line.
 *   'NA': is a missing value borrowed from R language.
 
-If a token has only 1 character and this character is an uppercase letter, then this token is treated as a capitalized word; for example, the word "É" is a capitalized word.
+If a token has only 1 character and this character is an uppercase letter, then this token is treated as a capitalized word.
 
 Only line endings (\n) and tabs (\t) separate records and fields, respectively. No quotes are used, despite Github complaints about ["unclosed quoted fields"](https://docs.github.com/pt/repositories/working-with-files/using-files/working-with-non-code-files). If you are curiouse aboute TSV files, [read this](https://github.com/eBay/tsv-utils/blob/master/docs/comparing-tsv-and-csv.md).
 
@@ -240,7 +282,7 @@ falecido|1|0.013698630|A|L|8|9
 
 The text was extracted from a random [Wikipedia page](https://pt.wikipedia.org/wiki/Lucius_Ferraris) in Portuguese.
 
-Note that case, punctuation, line ending, and stop words are preserved. The author wants to keep them. But they can be easily transformed or removed.
+Note that letter case, punctuation, end of line, and stop words are preserved. The author wants to keep them as they are. But they can be easily transformed or removed if necessary.
 
 License
 ------------------------------------------------------
