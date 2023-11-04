@@ -1,7 +1,7 @@
-ABoW 🏹
+ABoW
 ======================================================
 
-ABoW stands for Awk Bag of Words.
+ABoW stands for Awk Bag of Words. 🏹
 
 Usage
 ------------------------------------------------------
