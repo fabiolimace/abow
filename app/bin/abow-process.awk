@@ -61,7 +61,8 @@ BEGIN {
 
 }
 
-{
+NF {
+
     $0=" " $0 " "; # add spaces at both sides to make escapes easier.
     gsub(/ [\$€£§@#]\</," \x1A&\x1A"); # escape at the start of words:      `$` `€` `£` `§` `@` `#`
     gsub(/\>[\$¢°%] /,"\x1A&\x1A "); # escape at end of words:              `$` `¢` `°` `%`
@@ -71,15 +72,11 @@ BEGIN {
     $0 = gensub(/([^\x1A ])([[:punct:]])/,"\\1 \\2","g");
     $0 = gensub(/([[:punct:]])([^\x1A ])/,"\\1 \\2","g");
     gsub(/\x1A/,""); # remove all SUBSTITUTE characters (\x1A)
-}
 
-{
     for (i = 1; i <= NF; i++) {
         insert($i);
     }
-}
 
-{
     insert("<EOL>");
 }
 
