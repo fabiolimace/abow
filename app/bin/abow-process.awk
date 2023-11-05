@@ -65,7 +65,7 @@ BEGIN {
     $0=" " $0 " "; # add spaces at both sides to make escapes easier.
     gsub(/ [\$€£§@#]\</," \x1A&\x1A"); # escape at the start of words:      `$` `€` `£` `§` `@` `#`
     gsub(/\>[\$¢°%] /,"\x1A&\x1A "); # escape at end of words:              `$` `¢` `°` `%`
-    gsub(/\>[\$§@°&/.,'-]\</,"\x1A&\x1A"); # escape in the middle of words. `$` `§` `@` `°` `&` `/` `.` `,` `'` `-`
+    gsub(/\>[\$§@°&/.,':-]\</,"\x1A&\x1A"); # escape in the middle of words. `$` `§` `@` `°` `&` `/` `.` `,` `'` `:` `-`
     
     $0 = gensub(/([[:punct:]])([[:punct:]])/,"\\1 \\2","g");
     $0 = gensub(/([^\x1A ])([[:punct:]])/,"\\1 \\2","g");
