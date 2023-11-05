@@ -63,58 +63,24 @@ BEGIN {
 
 {
     $0=" " $0 " "; # add spaces at both sides to make escapes easier.
-    gsub(/\xA0/,""); # remove all NBSP to use them as escape characters.
-    gsub(/ [\$€£§@#]\</," \xA0&\xA0"); # escape at the start of words:      `$` `€` `£` `§` `@` `#`
-    gsub(/\>[\$¢°%] /,"\xA0&\xA0 "); # escape at end of words:              `$` `¢` `°` `%`
-    gsub(/\>[\$§@°&/.,'-]\</,"\xA0&\xA0"); # escape in the middle of words. `$` `§` `@` `°` `&` `/` `.` `,` `'` `-`
+    gsub(/ [\$€£§@#]\</," \x1A&\x1A"); # escape at the start of words:      `$` `€` `£` `§` `@` `#`
+    gsub(/\>[\$¢°%] /,"\x1A&\x1A "); # escape at end of words:              `$` `¢` `°` `%`
+    gsub(/\>[\$§@°&/.,'-]\</,"\x1A&\x1A"); # escape in the middle of words. `$` `§` `@` `°` `&` `/` `.` `,` `'` `-`
     
     $0 = gensub(/([[:punct:]])([[:punct:]])/,"\\1 \\2","g");
-    $0 = gensub(/([^\xA0 ])([[:punct:]])/,"\\1 \\2","g");
-    $0 = gensub(/([[:punct:]])([^\xA0 ])/,"\\1 \\2","g");
-    gsub(/\xA0/,""); # remove all NBSP again
+    $0 = gensub(/([^\x1A ])([[:punct:]])/,"\\1 \\2","g");
+    $0 = gensub(/([[:punct:]])([^\x1A ])/,"\\1 \\2","g");
+    gsub(/\x1A/,""); # remove all SUBSTITUTE characters (\x1A)
 }
 
 {
     for (i = 1; i <= NF; i++) {
-
-        match($i, /^([[:punct:]]+)?\<(.+)\>([[:punct:]]+)?$/, matches);
-        
-        # puncts before
-        if (matches[1]) {
-            token=matches[1];
-            if (length(token) > 1) {
-                split(token, puncts, //);
-                for (p in puncts) {
-                    insert(puncts[p]);
-                }
-            } else {
-                insert(token);
-            }
-        }
-        
-        if (matches[2]) {
-            insert(matches[2]);
-        }
-        
-        # puncts after
-        if (matches[3]) {
-            token=matches[3];
-            if (length(token) > 1) {
-                split(token, puncts, //);
-                for (p in puncts) {
-                    insert(puncts[p]);
-                }
-            } else {
-                insert(token);
-            }
-        }
+        insert($i);
     }
-    
-    insert("<EOL>")
-    
-    # NOTE:
-    # Non-breaking Spaces (NBSP, 0xA0) cause wrong word slitting.
-    # You must replace them with regular spaces.
+}
+
+{
+    insert("<EOL>");
 }
 
 END {
