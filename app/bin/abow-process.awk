@@ -62,6 +62,19 @@ BEGIN {
 }
 
 {
+    $0=" " $0 " "; # add spaces at both sides to make escapes easier.
+    gsub(/\xA0/,""); # remove all NBSP to use them as escape characters.
+    gsub(/ [\$€£§@#]\</," \xA0&\xA0"); # escape at the start of words:      `$` `€` `£` `§` `@` `#`
+    gsub(/\>[\$¢°%] /,"\xA0&\xA0 "); # escape at end of words:              `$` `¢` `°` `%`
+    gsub(/\>[\$§@°&/.,'-]\</,"\xA0&\xA0"); # escape in the middle of words. `$` `§` `@` `°` `&` `/` `.` `,` `'` `-`
+    
+    $0 = gensub(/([[:punct:]])([[:punct:]])/,"\\1 \\2","g");
+    $0 = gensub(/([^\xA0 ])([[:punct:]])/,"\\1 \\2","g");
+    $0 = gensub(/([[:punct:]])([^\xA0 ])/,"\\1 \\2","g");
+    gsub(/\xA0/,""); # remove all NBSP again
+}
+
+{
     for (i = 1; i <= NF; i++) {
 
         match($i, /^([[:punct:]]+)?\<(.+)\>([[:punct:]]+)?$/, matches);
