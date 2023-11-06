@@ -1,7 +1,7 @@
-ABoW
+ABW
 ======================================================
 
-ABoW stands for Awk Bag of Words. 🏹
+ABW stands for Awk Bag of Words.
 
 Usage
 ------------------------------------------------------
@@ -11,19 +11,19 @@ Usage
 Process files to the standard output:
 
 ```bash
-abow -p FILE [...]
+abw -p FILE [...]
 ```
 ```bash
-abow --process FILE [...]
+abw --process FILE [...]
 ```
 
 Process files to an output file:
 
 ```bash
-abow -p -o OUTPUT FILE [...]
+abw -p -o OUTPUT FILE [...]
 ```
 ```bash
-abow --process --output OUTPUT FILE [...]
+abw --process --output OUTPUT FILE [...]
 ```
 
 Where:
@@ -36,28 +36,28 @@ Where:
 List files:
 
 ```bash
-abow -l
+abw -l
 ```
 ```bash
-abow --list
+abw --list
 ```
 
 List files of a collection:
 
 ```bash
-abow -l -c COLLECTION
+abw -l -c COLLECTION
 ```
 ```bash
-abow --list --collection COLLECTION
+abw --list --collection COLLECTION
 ```
 
 List files of a collection selecting some metadata fields:
 
 ```bash
-abow -l -c COLLECTION -m "suid,collection,name,size,date"
+abw -l -c COLLECTION -m "suid,collection,name,size,date"
 ```
 ```bash
-abow --list --collection COLLECTION --meta "suid,collection,name,size,date"
+abw --list --collection COLLECTION --meta "suid,collection,name,size,date"
 ```
 
 ### Show files
@@ -65,28 +65,28 @@ abow --list --collection COLLECTION --meta "suid,collection,name,size,date"
 Show a `text.txt` file:
 
 ```bash
-abow -s SHORT_ID
+abw -s SHORT_ID
 ```
 ```bash
-abow --show SHORT_ID
+abw --show SHORT_ID
 ```
 
 Show a `meta.txt` file:
 
 ```bash
-abow -s -m SHORT_ID
+abw -s -m SHORT_ID
 ```
 ```bash
-abow --show --meta SHORT_ID
+abw --show --meta SHORT_ID
 ```
 
 Show a `data.tsv` file:
 
 ```bash
-abow -s -d SHORT_ID
+abw -s -d SHORT_ID
 ```
 ```bash
-abow --show --data SHORT_ID
+abw --show --data SHORT_ID
 ```
 
 ### Search in files
@@ -94,28 +94,28 @@ abow --show --data SHORT_ID
 Search in `text.txt` files using a regex:
 
 ```bash
-abow -g REGEX
+abw -g REGEX
 ```
 ```bash
-abow --grep REGEX
+abw --grep REGEX
 ```
 
 Search in `meta.txt` files using a regex:
 
 ```bash
-abow -g -m REGEX
+abw -g -m REGEX
 ```
 ```bash
-abow --grep --meta REGEX
+abw --grep --meta REGEX
 ```
 
 Search in `data.tsv` files using a regex:
 
 ```bash
-abow -g -d REGEX
+abw -g -d REGEX
 ```
 ```bash
-abow --grep -data REGEX
+abw --grep -data REGEX
 ```
 
 ### Import files
@@ -123,28 +123,28 @@ abow --grep -data REGEX
 Import files:
 
 ```bash
-abow -i FILE [...]
+abw -i FILE [...]
 ```
 ```bash
-abow --import FILE [...]
+abw --import FILE [...]
 ```
 
 Import files recursivelly:
 
 ```bash
-abow -i -r DIRECTORY [...]
+abw -i -r DIRECTORY [...]
 ```
 ```bash
-abow --import --recursive DIRECTORY [...]
+abw --import --recursive DIRECTORY [...]
 ```
 
 Import files recursivelly into a collection:
 
 ```bash
-abow -i -r -c COLLECTION DIRECTORY [...]
+abw -i -r -c COLLECTION DIRECTORY [...]
 ```
 ```bash
-abow --import --recursive --collection COLLECTION DIRECTORY [...]
+abw --import --recursive --collection COLLECTION DIRECTORY [...]
 ```
 
 Where:
