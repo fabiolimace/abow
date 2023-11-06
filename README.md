@@ -3,6 +3,13 @@ ABW
 
 ABW stands for Awk Bag of Words.
 
+This project has been renamed from `ABoW` to `ABW`. Update your config with this command:
+
+```bash
+cd path/to/abow
+sed -i 's,abow.git,abw.git,g' .git/config
+```
+
 Usage
 ------------------------------------------------------
 
