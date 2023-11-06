@@ -2,9 +2,9 @@
 #
 # Usage:
 #
-#    abow-list
-#    abow-list -c COLLECTION
-#    abow-list -c COLLECTION -m "hash,name"
+#    abw-list
+#    abw-list -c COLLECTION
+#    abw-list -c COLLECTION -m "hash,name"
 #
 
 BASEDIR=`dirname $0`
@@ -29,7 +29,7 @@ declare -A meta;
 declare -A size;
 
 if [[ ! -d "$DATADIR/$COLLECTION" ]]; then
-    echo "abow-list.sh: $COLLECTION: Collection not found" >> /dev/stderr;
+    echo "abw-list.sh: $COLLECTION: Collection not found" >> /dev/stderr;
     exit 1;
 fi;
 

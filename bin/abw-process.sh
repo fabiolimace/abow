@@ -1,12 +1,12 @@
 #!/bin/bash
 #
-# This is a wrapper for `abow-process.awk`.
+# This is a wrapper for `abw-process.awk`.
 #
 # Usage:
 #
-#    abow-process FILE [...]
-#    abow-process FILE [...] > OUTPUT
-#    abow-process -o OUTPUT FILE [...]
+#    abw-process FILE [...]
+#    abw-process FILE [...] > OUTPUT
+#    abw-process -o OUTPUT FILE [...]
 #
 
 declare -A options;
@@ -27,17 +27,17 @@ OUTPUT_FILE="${options["o"]:=/dev/stdout}"
 for i in $INPUT_FILES; do
     if [[ ! -f "$i" && "$i" != /dev/stdin ]];
     then
-        echo "abow-process.sh: $i: File not found" >> /dev/stderr;
+        echo "abw-process.sh: $i: File not found" >> /dev/stderr;
         exit 1;
     fi;
 done;
 
 if [[ -f "$OUTPUT_FILE" && "$OUTPUT_FILE" != /dev/stdout && ! ${options["f"]} ]];
 then
-    echo "abow-process.sh: $OUTPUT_FILE: File already exists" >> /dev/stderr;
+    echo "abw-process.sh: $OUTPUT_FILE: File already exists" >> /dev/stderr;
     exit 1;
 fi;
 
 BASEDIR=`dirname $0`
-$BASEDIR/abow-process.awk $INPUT_FILES > $OUTPUT_FILE
+$BASEDIR/abw-process.awk $INPUT_FILES > $OUTPUT_FILE
 

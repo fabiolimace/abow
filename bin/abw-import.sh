@@ -2,9 +2,9 @@
 #
 # Usage:
 #
-#    abow-import INPUT_FILE [FILE...]
-#    abow-import -r DIRECTORY [DIRECTORY...]
-#    abow-import -r -c COLLECTION DIRECTORY [...]
+#    abw-import INPUT_FILE [FILE...]
+#    abw-import -r DIRECTORY [DIRECTORY...]
+#    abw-import -r -c COLLECTION DIRECTORY [...]
 #
 
 BASEDIR=`dirname $0`
@@ -29,7 +29,7 @@ function import_file {
     
     if [[ ! -f "$INPUT_FILE" ]];
     then
-        echo "abow-import.sh: $INPUT_FILE: File not found" >> /dev/stderr;
+        echo "abw-import.sh: $INPUT_FILE: File not found" >> /dev/stderr;
         return;
     fi;
     
@@ -43,7 +43,7 @@ function import_file {
     
     if [[ -d $ITEM && ! ${options["f"]} ]];
     then
-        echo "abow-import.sh: $INPUT_FILE: Fire already imported to '$COLLECTION/$SUID/'" >> /dev/stderr;
+        echo "abw-import.sh: $INPUT_FILE: Fire already imported to '$COLLECTION/$SUID/'" >> /dev/stderr;
         return;
     fi;
     
@@ -61,7 +61,7 @@ function import_file {
     echo "mime=`file -bi $INPUT_FILE`" >> $META
     echo "size=`wc -c $INPUT_FILE | cut -d" " -f1`" >> $META
    
-    $BASEDIR/abow-process.sh -f -o $DATA $TEXT
+    $BASEDIR/abw-process.sh -f -o $DATA $TEXT
     
     if [[ ${options["v"]} ]]; then
         echo "Imported '$INPUT_FILE' to '$COLLECTION/$SUID/'"
@@ -75,7 +75,7 @@ function import_directory {
     
     if [[ ! -d "$INPUT_FILE" ]];
     then
-        echo "abow-import.sh: $INPUT_FILE: Directory not found" >> /dev/stderr;
+        echo "abw-import.sh: $INPUT_FILE: Directory not found" >> /dev/stderr;
         return;
     fi;
 
@@ -94,7 +94,7 @@ function import_recursive {
     elif [[ -d "$INPUT_FILE" ]]; then
         import_directory "$COLLECTION" "$INPUT_FILE";
     else
-        echo "abow-import.sh: $INPUT_FILE: File or directory not found" >> /dev/stderr;
+        echo "abw-import.sh: $INPUT_FILE: File or directory not found" >> /dev/stderr;
         return;
     fi;
 }

@@ -2,10 +2,10 @@
 #
 # Usage:
 #
-#    abow-show SUID
-#    abow-show -c COLLECTION SUID
-#    abow-show -c COLLECTION -m SUID
-#    abow-show -c COLLECTION -d SUID
+#    abw-show SUID
+#    abw-show -c COLLECTION SUID
+#    abw-show -c COLLECTION -m SUID
+#    abw-show -c COLLECTION -d SUID
 #
 
 BASEDIR=`dirname $0`
@@ -27,7 +27,7 @@ SUID="${1}";
 COLLECTION="${options["c"]:-default}"
 
 if [[ ! -d "$DATADIR/$COLLECTION" ]]; then
-    echo "abow-show.sh: $COLLECTION: Directory not found" >> /dev/stderr;
+    echo "abw-show.sh: $COLLECTION: Directory not found" >> /dev/stderr;
     exit 1;
 fi;
 

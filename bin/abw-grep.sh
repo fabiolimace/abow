@@ -2,10 +2,10 @@
 #
 # Usage:
 #
-#    abow-grep REGEX
-#    abow-grep -c COLLECTION REGEX
-#    abow-grep -c COLLECTION -m REGEX
-#    abow-grep -c COLLECTION -d REGEX
+#    abw-grep REGEX
+#    abw-grep -c COLLECTION REGEX
+#    abw-grep -c COLLECTION -m REGEX
+#    abw-grep -c COLLECTION -d REGEX
 #
 
 BASEDIR=`dirname $0`
@@ -27,7 +27,7 @@ REGEX="${1}";
 COLLECTION="${options["c"]:-default}"
 
 if [[ ! -d "$DATADIR/$COLLECTION" ]]; then
-    echo "abow-grep.sh: $COLLECTION: Collection not found" >> /dev/stderr;
+    echo "abw-grep.sh: $COLLECTION: Collection not found" >> /dev/stderr;
     exit 1;
 fi;
 
