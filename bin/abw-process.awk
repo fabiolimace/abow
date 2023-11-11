@@ -14,7 +14,7 @@ function character_class(token)
     case /^[[:punct:]]+$/:
         return "P"; # Punct (only)
     default:
-        return "NA";
+        return "M"; # Mixed (alpha, digit, and punct)
     }
     
     # NOTE:
