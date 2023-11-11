@@ -175,12 +175,51 @@ END {
     }
     # end of operational checks #
 
-    print "TOKEN\tCOUNT\tRATIO\tCLASS\tCASE\tLENGTH\tINDEXES"
+    default_fields="token,count,ratio,class,case,length,indexes";
+    if (!length(fields)) split(default_fields, fields, ",");
+
+    for (f in fields) {
+        if (default_fields ~ "\\<" fields[f] "\\>" ) {
+            printf "%s\t", toupper(fields[f]);
+        }
+    }
+    printf "\n";
     
     for (token in counters) {
+
         count = counters[token];
         ratio = counters[token] / total;
-        printf "%s\t%d\t%.9f\t%s\t%s\t%d\t%s\n", token, count, ratio, character_class(token), letter_case(token), length(token), join(indexes[token]);
+
+        for (f in fields) {
+            if (default_fields ~ "\\<" fields[f] "\\>" ) {
+                switch (fields[f]) {
+                case "token":
+                    printf "%s\t", token
+                    break;
+                case "count":
+                    printf "%d\t", count
+                    break;
+                case "ratio":
+                    printf "%.9f\t", ratio
+                    break;
+                case "class":
+                    printf "%s\t", character_class(token)
+                    break;
+                case "case":
+                    printf "%s\t", letter_case(token)
+                    break;
+                case "length":
+                    printf "%d\t", length(token)
+                    break;
+                case "indexes":
+                    printf "%s\t", join(indexes[token])
+                    break;
+                default:
+                    continue;
+                }
+            }
+        }
+        printf "\n";
     }
 }
 
