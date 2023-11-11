@@ -58,20 +58,76 @@ function insert(token) {
 }
 
 BEGIN {
-
+    split(FIELDS,fields,",");
+    split(OPTIONS,options,",");
 }
 
 NF {
 
     $0=" " $0 " "; # add spaces at both sides to make escapes easier.
-    gsub(/ [\$€£§@#]\</," \x1A&\x1A"); # escape at the start of words:      `$` `€` `£` `§` `@` `#`
+    gsub(/ [\$€£@#]\</," \x1A&\x1A"); # escape at the start of words:       `$` `€` `£` `@` `#`
     gsub(/\>[\$¢°%] /,"\x1A&\x1A "); # escape at end of words:              `$` `¢` `°` `%`
-    gsub(/\>[\$§@°&/.,':-]\</,"\x1A&\x1A"); # escape in the middle of words. `$` `§` `@` `°` `&` `/` `.` `,` `'` `:` `-`
+    gsub(/\>[\$@&/.,':-]\</,"\x1A&\x1A"); # escape in the middle of words.  `$` `@` `&` `/` `.` `,` `'` `:` `-`
     
     $0 = gensub(/([[:punct:]])([[:punct:]])/,"\\1 \\2","g");
     $0 = gensub(/([^\x1A ])([[:punct:]])/,"\\1 \\2","g");
     $0 = gensub(/([[:punct:]])([^\x1A ])/,"\\1 \\2","g");
     gsub(/\x1A/,""); # remove all SUBSTITUTE characters (\x1A)
+
+    for (o in options) {
+        switch (options[o]) {
+        case "ascii":
+            # Transliterate Unicode Latin-1 Supplement characters
+            gsub(/[ÀÁÂÃÄÅ]/,"A");
+            gsub(/[ÈÉÊË]/,"E");
+            gsub(/[ÌÍÎÏ]/,"I");
+            gsub(/[ÒÓÔÕÖ]/,"O");
+            gsub(/[ÙÚÛÜ]/,"U");
+            gsub(/Ý/,"Y");
+            gsub(/Ç/,"C");
+            gsub(/Ñ/,"N");
+            gsub(/Ð/,"D");
+            gsub(/Ø/,"OE");
+            gsub(/Þ/,"TH");
+            gsub(/Æ/,"AE");
+            gsub(/[àáâãäåª]/,"a");
+            gsub(/[èéêë]/,"e");
+            gsub(/[ìíîï]/,"i");
+            gsub(/[òóôõöº]/,"o");
+            gsub(/[ùúûü]/,"u");
+            gsub(/[ýÿ]/,"y");
+            gsub(/ç/,"c");
+            gsub(/ñ/,"n");
+            gsub(/ð/,"d");
+            gsub(/ø/,"oe");
+            gsub(/þ/,"th");
+            gsub(/ae/,"ae");
+            gsub(/ß/,"ss");
+            # Replace non-ASCII with SUB
+            gsub(/[^\x00-\x7E]/,"\x1A");
+            break;
+        case "lower":
+            $0 = tolower($0);
+            break;
+        case "upper":
+            $0 = toupper($0);
+            break;
+        case "noalpha":
+            gsub(/[[:alpha:]]+/,"");
+            break;
+        case "nodigit":
+            gsub(/[[:digit:]]+/,"");
+            break;
+        case "nopunct":
+            gsub(/[[:punct:]]+/,"");
+            break;
+        case "nomixed":
+            gsub(/([[:alpha:]]+([[:punct:][:digit:]]+[[:alpha:]]+)+|[[:digit:]]+([[:punct:][:alpha:]]+[[:digit:]]+)+)/,"");
+            break;
+        default:
+            continue;
+        }
+    }
 
     for (i = 1; i <= NF; i++) {
         insert($i);

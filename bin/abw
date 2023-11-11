@@ -21,8 +21,9 @@
 #    abw --grep --collection COLLECTION -d REGEX
 #
 #    abw --process FILE [...]
-#    abw --process FILE [...] > OUTPUT
-#    abw --process -output OUTPUT FILE [...]
+#    abw --options lower,ascii FILE [...]
+#    abw --fields token,count FILE [...]
+#    abw --options lower,ascii --fields token,count FILE [...] > OUTPUT
 #
 #    abw --import FILE [...]
 #    abw --import -recursive DIRECTORY [...]
@@ -45,14 +46,14 @@ args=${args//--show/-s}
 args=${args//--grep/-g}
 # process
 args=${args//--process/-p}
-args=${args//--output/-o}
+args=${args//--options/-o}
+args=${args//--fields/-f}
 # import
 args=${args//--import/-i}
 args=${args//--recursive/-r}
 # generic
 args=${args//--collection/-c}
 args=${args//--verbose/-v}
-args=${args//--force/-f}
 args=${args//--meta/-m}
 args=${args//--data/-d}
 args=${args//--help/-h} # TODO
@@ -61,7 +62,7 @@ shopt -s extglob # remove unknown
 args=${args//--+([a-zA-Z0-9-])/-?}
 
 declare -A options;
-OPTSTRING="lspoic:rvgmdh"
+OPTSTRING="lsgpo:f:irc:vmdh"
 
 while getopts "$OPTSTRING" name ${args}; do
 

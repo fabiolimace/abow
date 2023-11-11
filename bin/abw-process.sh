@@ -5,12 +5,13 @@
 # Usage:
 #
 #    abw-process FILE [...]
-#    abw-process FILE [...] > OUTPUT
-#    abw-process -o OUTPUT FILE [...]
+#    abw-process -o lower,ascii FILE [...]
+#    abw-process -f token,count FILE [...]
+#    abw-process -o lower -f token,count FILE [...] > OUTPUT
 #
 
 declare -A options;
-OPTSTRING="po:f"
+OPTSTRING="po:f:"
 
 while getopts "$OPTSTRING" name ${@}; do
       if [[ ${OPTARG} ]]; then
@@ -22,7 +23,8 @@ done;
 shift $(( ${OPTIND} - 1 ));
 
 INPUT_FILES="${@:-/dev/stdin}"
-OUTPUT_FILE="${options["o"]:=/dev/stdout}"
+FIELDS="-v FIELDS=${options["f"]}"
+OPTIONS="-v OPTIONS=${options["o"]}"
 
 for i in $INPUT_FILES; do
     if [[ ! -f "$i" && "$i" != /dev/stdin ]];
@@ -32,12 +34,19 @@ for i in $INPUT_FILES; do
     fi;
 done;
 
-if [[ -f "$OUTPUT_FILE" && "$OUTPUT_FILE" != /dev/stdout && ! ${options["f"]} ]];
+if [[ ! ${options["f"]} =~ [[:alpha:],]* ]];
 then
-    echo "abw-process.sh: $OUTPUT_FILE: File already exists" >> /dev/stderr;
+    echo "abw-process.sh: $i: Invalid fields string" >> /dev/stderr;
     exit 1;
 fi;
 
+if [[ ! ${options["o"]} =~ [[:alpha:],]* ]];
+then
+    echo "abw-process.sh: $i: Invalid options string" >> /dev/stderr;
+    exit 1;
+fi;
+
+
 BASEDIR=`dirname $0`
-$BASEDIR/abw-process.awk $INPUT_FILES > $OUTPUT_FILE
+$BASEDIR/abw-process.awk $FIELDS $OPTIONS $INPUT_FILES > /dev/stdout
 
