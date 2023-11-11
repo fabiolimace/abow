@@ -45,12 +45,12 @@ abw --fields token,count FILE [...]
 Process files with a list of options:
 
 ```bash
-abw -o lower,ascii FILE [...]
+abw -o lang=pt,nostopwords,lower,ascii FILE [...]
 ```
 ```bash
-abw --options lower,ascii FILE [...]
+abw --options lang=pt,nostopwords,lower,ascii FILE [...]
 ```
-
+Process files with a list of options:
 Where:
 
 *   `FILE`: is a plain text file.
@@ -255,6 +255,8 @@ Where:
 *   `<EOL>`: is a symbol for the end of line.
 *   'NA': is a missing value borrowed from R language.
 
+The fields shown in the output is controlled by passing a list of `--fields`.
+
 If a token has only 1 character and this character is an uppercase letter, then this token is treated as a capitalized word.
 
 Only line endings (\n) and tabs (\t) separate records and fields, respectively. No quotes are used, despite Github complaints about ["unclosed quoted fields"](https://docs.github.com/pt/repositories/working-with-files/using-files/working-with-non-code-files). If you are curiouse aboute TSV files, [read this](https://github.com/eBay/tsv-utils/blob/master/docs/comparing-tsv-and-csv.md).
@@ -319,7 +321,7 @@ falecido|1|0.013698630|A|L|8|9
 
 The text was extracted from a random [Wikipedia page](https://pt.wikipedia.org/wiki/Lucius_Ferraris) in Portuguese.
 
-Note that letter case, punctuation, end of line, and stop words are preserved. The author wants to keep them as they are. But they can be easily transformed or removed if necessary.
+Note that letter case, punctuation, end of line, and stop words are preserved. They can be transformed or removed passing a list of `--options`.
 
 License
 ------------------------------------------------------

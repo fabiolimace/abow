@@ -23,7 +23,7 @@
 #    abw --process FILE [...]
 #    abw --process FILE [...] > OUTPUT
 #    abw --fields token,count FILE [...]
-#    abw --options lower,ascii FILE [...]
+#    abw --options lang=pt,nostopwords,lower,ascii FILE [...]
 #
 #    abw --import FILE [...]
 #    abw --import -recursive DIRECTORY [...]
