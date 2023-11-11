@@ -24,7 +24,7 @@ shift $(( ${OPTIND} - 1 ));
 
 INPUT_FILES="${@:-/dev/stdin}"
 FIELDS="-v FIELDS=${options["f"]}"
-OPTIONS="-v OPTIONS=${options["o"]}"
+OPTIONS="-v OPTIONS=${options["o"]/=/:}"
 
 for i in $INPUT_FILES; do
     if [[ ! -f "$i" && "$i" != /dev/stdin ]];
@@ -47,5 +47,5 @@ then
 fi;
 
 BASEDIR=`dirname $0`
-$BASEDIR/abw-process.awk $FIELDS $OPTIONS $INPUT_FILES > /dev/stdout
+$BASEDIR/abw-process.awk -v PWD=$BASEDIR $FIELDS $OPTIONS $INPUT_FILES > /dev/stdout
 

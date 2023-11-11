@@ -57,9 +57,33 @@ function insert(token) {
     indexes[token][counters[token]]=total;
 }
 
+function get_option_argument(key) {
+    for (o in options) {
+        if (options[o] ~ "^" key ":") return lang=substr(options[o], index(options[o], ":") + 1);
+    }
+}
+
+function get_stopwords_regex(lang,    stopwords_file) {
+
+    stopwords_file=pwd "/../lib/lang/" lang "/stopwords.txt"
+    while((getline line < stopwords_file) > 0) {
+        if (line ~ /^#/) continue; # ignore line
+        if (stopwords_regex) stopwords_regex = stopwords_regex "|"
+        stopwords_regex=stopwords_regex tolower(line) "|" toupper(line) "|" toupper(substr(line,1,1)) tolower(substr(line,2));
+    }
+
+    if (!stopwords_regex) return "";
+    else return "\\<(" stopwords_regex ")\\>";
+}
+
 BEGIN {
+
+    pwd = PWD;
     split(FIELDS,fields,",");
     split(OPTIONS,options,",");
+
+    lang = get_option_argument("lang");
+    stopwords_regex=get_stopwords_regex(lang);
 }
 
 NF {
@@ -123,6 +147,9 @@ NF {
             break;
         case "nomixed":
             gsub(/([[:alpha:]]+([[:punct:][:digit:]]+[[:alpha:]]+)+|[[:digit:]]+([[:punct:][:alpha:]]+[[:digit:]]+)+)/,"");
+            break;
+        case "nostopwords":
+            gsub(stopwords_regex,"");
             break;
         default:
             continue;

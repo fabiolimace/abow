@@ -58,6 +58,7 @@ Where:
 
 Options:
 
+*   `lang=pt`: the language, e.g, `pt`
 *   `ascii`: convert to ASCII characters
 *   `lower`: convert to lower case characters
 *   `upper`: convert to upper case characters
@@ -65,6 +66,7 @@ Options:
 *   `nodigit`: remove all-digits tokens (numbers)
 *   `nopunct`: remove all-puncts tokens (punctuation)
 *   `nomixed`: remove mixed tokens (letters, digits and puncts mixed together)
+*   `nostopwords`: remove stop-word tokens (requires lang option)
 
 ### List files
 
