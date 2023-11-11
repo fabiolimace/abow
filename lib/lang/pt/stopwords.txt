@@ -1,5 +1,168 @@
+# Artigos
 a
+as
+o
+os
+um
+uns
+uma
+umas
+
+# Preposicoes
+a
+ante
+após
+até
+com
+contra
+de
+desde
+em
+entre,para
+per
+perante
+por
+sem
+sob
+sobre
+trás
+
+# Preposicoes + Artigos
 à
+às
+da
+das
+na
+nas
+pela
+pelas
+ao
+aos
+do
+dos
+no
+nos
+pelo
+pelos
+dum
+duns
+duma
+dumas
+num
+nuns
+numa
+numas
+pra
+pras
+pro
+pros
+
+# preposicao 'a' + Pronome
+àquela
+àquelas
+àquele
+àqueles
+àquilo
+
+# preposicao 'de' + pron
+deste
+desse
+daquele
+destes
+desses
+daqueles
+desta
+dessa
+daquela
+destas
+dessas
+daquelas
+disto
+disso
+daquilo
+
+# preposicao 'em' + pron
+neste
+nesse
+naquele
+nestes
+nesses
+naqueles
+nesta
+nessa
+naquela
+nestas
+nessas
+naquelas
+nisto
+nisso
+naquilo
+
+# Preposicoes compostas
+abaixo de
+acerca de
+acima de
+a despeito de
+adiante de
+a fim de
+além de
+antes de
+ao invés de
+ao lado de
+ao redor de
+a par de
+apesar de
+a respeito de
+até a
+atrás de
+cerca de
+de acordo com
+debaixo de
+de cima de
+defronte de
+dentro de
+depois de
+devido a
+diante de
+embaixo de
+em face de
+em frente a
+em frente de
+em lugar de
+em redor de
+em torno de
+em vez de
+fora de
+graças a
+junto a
+junto de
+para baixo de
+para cima de
+para com
+perto de
+por baixo de
+por cima de
+por detrás de
+por diante de
+por entre
+por trás de
+
+# Preposicoes acidentais
+afora
+conforme
+consoante
+durante
+exceto
+fora
+mediante
+não obstante
+salvo
+segundo
+senão
+tirante
+visto
+
+# Adverbios
 abaixo
 acaso
 acima
@@ -10,19 +173,12 @@ ainda
 além
 ali
 amanhã
-ante
 anteontem
 antes
-ao
-aos
-após
 aquém
 aqui
-as
-às
 assaz
 assim
-até
 atrás
 através
 bastante
@@ -31,31 +187,17 @@ breve
 cá
 cedo
 certamente
-com
 como
-contra
-da
-das
-de
 debalde
 defronte
 demais
 dentro
 depois
 depressa
-desde
 detrás
 devagar
-do
-dos
-dum
-duma
-dumas
-duns
 efetivamente
-em
 então
-entre
 fora
 hoje
 já
@@ -69,38 +211,16 @@ mal
 melhor
 menos
 muito
-na
 não
-nas
-no
-nos
-num
-numa
-numas
 nunca
-nuns
-o
 onde
 ontem
-os
 outrora
-para
-pela
-pelas
-pelo
-pelos
-per
-perante
 perto
 pior
-por
 porventura
 possivelmente
 pouco
-pra
-pras
-pro
-pros
 provavelmente
 quando
 quanto
@@ -108,18 +228,549 @@ quão
 quase
 quiçá
 realmente
-sem
 sempre
 sim
-sob
-sobre
 talvez
 tampouco
 tanto
 tão
 tarde
-trás
-um
-uma
-umas
-uns
+
+# coordenativas aditivas
+e
+nem
+
+# coordenativas adversativas
+mas
+porém
+todavia
+contudo
+no entanto
+entretanto
+
+# coordenativas alternativas
+ou
+# ou...ou
+# ora...ora
+# quer...quer
+# seja...seja
+# nem...nem
+# já...já
+
+# coordenativas conclusivas
+logo
+pois
+portanto
+por conseguinte
+por isso
+assim
+então
+
+# coordenativas explicativa
+que
+porque
+pois
+porquanto
+
+# subordinativas causais
+porque
+pois
+porquanto
+como
+pois que
+por isso que
+já que
+uma vez que
+visto que
+visto como
+que
+
+# subordinativas comparativas
+que
+do que
+tal
+tanto
+como
+assim como
+bem como
+como se
+que nem
+
+# subordinativas concessivas
+embora
+conquanto
+ainda que
+mesmo que
+posto que
+bem que
+se bem que
+apesar de que
+nem que
+que
+
+# subordinativas condicionais
+se
+caso
+contanto que
+salvo se
+sem que
+dado que
+desde que
+a menos que
+a não ser que
+
+# subordinativas conformativas
+conforme
+como
+segundo
+consoante
+
+# subordinativas consecutivas
+que
+de forma que
+de maneira que
+de modo que
+de sorte que
+
+# subordinativas finais
+para que
+a fim de que
+porque
+que
+
+# subordinativas proporcionais
+à medida que
+ao passo que
+à proporção que
+enquanto
+quanto mais
+quanto menos
+
+# subordinativas temporais
+quando
+antes que
+depois que
+até que
+logo que
+sempre que
+assim que
+desde que
+todas as vezes que
+cada vez que
+apenas
+mal
+que
+
+# subordinativas integrantes
+que
+se
+
+# locuções denotativas de inclusão
+até
+inclusive
+mesmo
+também
+
+# locuções denotativas de exclusão
+apenas
+menos
+salvo
+senão
+só
+somente
+
+# locuções denotativas de designação
+eis
+eis-me
+# ei-la ?
+# ei-las ?
+# ei-lo ?
+# ei-la ?
+
+# locuções denotativas de realce
+cá
+lá
+é que
+ora
+só
+
+# locuções denotativas de retificação
+aliás
+ou antes
+isto é
+ou melhor
+
+# locuções denotativas de situação
+afinal
+agora
+então
+mas
+
+# demonstrativos que funcionam como pronomes adjetivos ou pronomes substantivos
+este
+esse
+aquele
+estes
+esses
+aqueles
+esta
+essa
+aquela
+estas
+essas
+aquelas
+isto
+isso
+aquilo
+
+# demonstrativos que funcionam apenas como pronomes substantivos
+a
+o
+as
+os
+
+# indefinidos
+
+# Pronomes indefinidos masculinos
+algum
+nenhum
+todo
+outro
+muito
+pouco
+certo
+vário
+tanto
+quanto
+qualquer
+
+# Pronomes indefinidos masculino plural
+alguns
+nenhuns
+todos
+outros
+muitos
+poucos
+certos
+vários
+tantos
+quantos
+quaisquer
+
+# Pronomes indefinidos feminino
+alguma
+nenhuma
+toda
+outra
+muita
+pouca
+certa
+vária
+tanta
+quanta
+qualquer
+
+# Pronomes indefinidos feminino plural
+algumas
+nenhumas
+todas
+outras
+muitas
+poucas
+certas
+várias
+tantas
+quantas
+quaisquer
+
+# Pronomes indefinidos invariaveis
+alguém
+ninguém
+tudo
+outrem
+nada
+cada
+algo
+
+# interrogativos
+que
+quem
+qual
+quais
+quanto
+quanta
+quantos
+quantas
+
+# pessoais pessoais oblíquos àtonos
+me
+te
+o
+a
+lhe
+nos
+vos
+os
+as
+lhes
+
+# pessoais pessoais oblíquos àtonos
+
+# (me, te, lhe, nos, vos, lhes) + o
+mo
+to
+lho
+no-lo
+vo-lo
+lho
+
+# (me, te, lhe, nos, vos, lhes) + a
+ma
+ta
+lha
+no-la
+vo-la
+lha
+
+# (me, te, lhe, nos, vos, lhes) + os
+tos
+lhos
+no-los
+vo-los
+lhos
+
+# (me, te, lhe, nos, vos, lhes) + as
+mas
+tas
+lhas
+no-las
+vo-las
+lhas
+
+# se + (me, te, lhe, nos, vos, lhes (nunca o, a, os, as)) [depois do verbo]
+se-me
+se-te
+se-lhe
+se-nos
+se-vos
+se-lhes
+
+# se + (me, te, lhe, nos, vos, lhes (nunca o, a, os, as)) [antes do verbo]
+se me
+se te
+se lhe
+se nos
+se vos
+se lhes
+
+# pessoais pessoais oblíquos mesoclíticos
+me
+te
+lhe
+nos
+vos
+lhes
+
+# a, as, o, os após letra que não seja r, s ou z
+a
+as
+o
+os
+
+# a, as, o, os após letra r, s ou z
+la
+las
+na
+nas
+lo
+los
+no
+nos
+
+# pessoais pessoais oblíquos mesoclíticos
+me
+te
+lhe
+nos
+vos
+lhes
+
+# a, as, o, os após a letra r do verbo no infinitivo (fazer + la = fazê-la)
+la
+las
+lo
+los
+
+# pessoais pessoais oblíquos tônicos
+mim
+comigo
+ti
+contigo
+ele
+ela
+nós
+conosco
+vós
+convosco
+eles
+elas
+
+# pessoais pessoais oblíquos tônicos preposicionados
+
+# a + pronome
+a mim
+a ti
+a ele
+a ela
+a nós
+a vós
+a eles
+a elas
+
+# de + pronome
+de mim
+de ti
+dele
+dela
+de nós
+de vós
+deles
+delas
+
+# com + pronome
+comigo
+contigo
+com ele
+com ela
+conosco
+convosco
+com eles
+com elas
+
+# em + pronome
+em mim
+em ti
+nele
+nela
+em nós
+em vós
+neles
+nelas
+
+# para + pronome
+para mim
+para ti
+para ele
+para ela
+para nós
+para vós
+para eles
+para elas
+
+# por + pronome
+por mim
+por ti
+por ele
+por ela
+por nós
+por vós
+por eles
+por elas
+
+# sem + pronome
+sem mim
+sem ti
+sem ele
+sem ela
+sem nós
+sem vós
+sem eles
+sem elas
+
+# pessoais pessoais reflexivos (ele, ela, eles, elas)
+se
+si
+consigo
+
+# pessoais pessoais reflexivos (demais pessoas: eu, tu, vós, nós)
+me
+te
+vos
+nos
+
+# pessoais pessoais recíprocos (uns aos outros, entre si, multuamente)
+nos
+vos
+se
+
+# pessoais pessoais retos
+eu
+tu
+ele
+ela
+nós
+vós
+eles
+elas
+
+# pessoais pessoais retos (consagrados pelo uso)
+você
+vocês
+
+# pessoais pessoais contraídos contraídos com preposições 'de' e 'em'
+dela
+delas
+dele
+deles
+nela
+nelas
+nele
+neles
+
+# pessoais possessivos
+meu
+minha
+teu
+tua
+seu
+sua
+meus
+minhas
+teus
+tuas
+seus
+suas
+nosso
+nossa
+vosso
+vossa
+seu
+sua
+nossos
+nossas
+vossos
+vossas
+seus
+suas
+
+# relativos
+o qual
+os quais
+cujo
+cujos
+quanto
+quantos
+a qual
+as quais
+cuja
+cujas
+# quanta
+quantas
+que
+quem
+onde
+
+# relativos preposicionados
+aonde
+donde
+
