@@ -21,9 +21,9 @@
 #    abw --grep --collection COLLECTION -d REGEX
 #
 #    abw --process FILE [...]
-#    abw --options lower,ascii FILE [...]
+#    abw --process FILE [...] > OUTPUT
 #    abw --fields token,count FILE [...]
-#    abw --options lower,ascii --fields token,count FILE [...] > OUTPUT
+#    abw --options lower,ascii FILE [...]
 #
 #    abw --import FILE [...]
 #    abw --import -recursive DIRECTORY [...]

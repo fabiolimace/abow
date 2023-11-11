@@ -27,16 +27,44 @@ abw --process FILE [...]
 Process files to an output file:
 
 ```bash
-abw -p -o OUTPUT FILE [...]
+abw -p FILE [...] > OUTPUT
 ```
 ```bash
-abw --process --output OUTPUT FILE [...]
+abw --process FILE [...] > OUTPUT
+```
+
+Process files with a list of fields:
+
+```bash
+abw -f token,count FILE [...]
+```
+```bash
+abw --fields token,count FILE [...]
+```
+
+Process files with a list of options:
+
+```bash
+abw -o lower,ascii FILE [...]
+```
+```bash
+abw --options lower,ascii FILE [...]
 ```
 
 Where:
 
 *   `FILE`: is a plain text file.
 *   `OUTPUT`: is a tab-separated value file.
+
+Options:
+
+*   `ascii`: convert to ASCII characters
+*   `lower`: convert to lower case characters
+*   `upper`: convert to upper case characters
+*   `noalpha`: remove all-letters tokens (words)
+*   `nodigit`: remove all-digits tokens (numbers)
+*   `nopunct`: remove all-puncts tokens (punctuation)
+*   `nomixed`: remove mixed tokens (letters, digits and puncts mixed together)
 
 ### List files
 

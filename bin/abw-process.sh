@@ -5,9 +5,9 @@
 # Usage:
 #
 #    abw-process FILE [...]
-#    abw-process -o lower,ascii FILE [...]
+#    abw-process FILE [...] > OUTPUT
 #    abw-process -f token,count FILE [...]
-#    abw-process -o lower -f token,count FILE [...] > OUTPUT
+#    abw-process -o lower,ascii FILE [...]
 #
 
 declare -A options;
@@ -45,7 +45,6 @@ then
     echo "abw-process.sh: $i: Invalid options string" >> /dev/stderr;
     exit 1;
 fi;
-
 
 BASEDIR=`dirname $0`
 $BASEDIR/abw-process.awk $FIELDS $OPTIONS $INPUT_FILES > /dev/stdout
