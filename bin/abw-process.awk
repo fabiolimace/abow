@@ -57,19 +57,76 @@ function insert(token) {
     indexes[token][counters[token]]=total;
 }
 
-function get_option_argument(key) {
-    for (o in options) {
-        if (options[o] ~ "^" key ":") return lang=substr(options[o], index(options[o], ":") + 1);
-    }
+function toascii(string) {
+
+    # Transliterate Unicode
+    # Latin-1 Supplement chars
+    gsub(/[ÀÁÂÃÄÅ]/,"A", string);
+    gsub(/[ÈÉÊË]/,"E", string);
+    gsub(/[ÌÍÎÏ]/,"I", string);
+    gsub(/[ÒÓÔÕÖ]/,"O", string);
+    gsub(/[ÙÚÛÜ]/,"U", string);
+    gsub(/Ý/,"Y", string);
+    gsub(/Ç/,"C", string);
+    gsub(/Ñ/,"N", string);
+    gsub(/Ð/,"D", string);
+    gsub(/Ø/,"OE", string);
+    gsub(/Þ/,"TH", string);
+    gsub(/Æ/,"AE", string);
+    gsub(/[àáâãäåª]/,"a", string);
+    gsub(/[èéêë]/,"e", string);
+    gsub(/[ìíîï]/,"i", string);
+    gsub(/[òóôõöº]/,"o", string);
+    gsub(/[ùúûü]/,"u", string);
+    gsub(/[ýÿ]/,"y", string);
+    gsub(/ç/,"c", string);
+    gsub(/ñ/,"n", string);
+    gsub(/ð/,"d", string);
+    gsub(/ø/,"oe", string);
+    gsub(/þ/,"th", string);
+    gsub(/ae/,"ae", string);
+    gsub(/ß/,"ss", string);
+    # Replace non-ASCII with SUB (0x1A)
+    gsub(/[^\x00-\x7E]/,"\x1A", string);
+
+    return string;
 }
 
-function get_stopwords_regex(lang,    stopwords_file) {
+function get_option(key) {
+    for (o in options) {
+        if (options[o] ~ "^" key "$") return 1;
+        if (options[o] ~ "^" key ":") return substr(options[o], index(options[o], ":") + 1);
+    }
+    return 0;
+}
+
+function get_stopwords_regex(lang,    stopwords_file, stopwords_regex, line) {
 
     stopwords_file=pwd "/../lib/lang/" lang "/stopwords.txt"
+
     while((getline line < stopwords_file) > 0) {
-        if (line ~ /^#/) continue; # ignore line
+
+        # skip line started with #
+        if (line ~ /^[[:space:]]*$/ || line ~ /^#/) continue;
+
+        for (o in options) {
+            switch (options[o]) {
+            case "ascii":
+                line = toascii(line);
+                break;
+            case "lower":
+                line = tolower(line);
+                break;
+            case "upper":
+                line = toupper(line);
+                break;
+            default:
+                continue;
+            }
+        }
+
         if (stopwords_regex) stopwords_regex = stopwords_regex "|"
-        stopwords_regex=stopwords_regex tolower(line) "|" toupper(line) "|" toupper(substr(line,1,1)) tolower(substr(line,2));
+        stopwords_regex=stopwords_regex line;
     }
 
     if (!stopwords_regex) return "";
@@ -82,7 +139,7 @@ BEGIN {
     split(FIELDS,fields,",");
     split(OPTIONS,options,",");
 
-    lang = get_option_argument("lang");
+    lang = get_option("lang");
     stopwords_regex=get_stopwords_regex(lang);
 }
 
@@ -101,34 +158,7 @@ NF {
     for (o in options) {
         switch (options[o]) {
         case "ascii":
-            # Transliterate Unicode Latin-1 Supplement characters
-            gsub(/[ÀÁÂÃÄÅ]/,"A");
-            gsub(/[ÈÉÊË]/,"E");
-            gsub(/[ÌÍÎÏ]/,"I");
-            gsub(/[ÒÓÔÕÖ]/,"O");
-            gsub(/[ÙÚÛÜ]/,"U");
-            gsub(/Ý/,"Y");
-            gsub(/Ç/,"C");
-            gsub(/Ñ/,"N");
-            gsub(/Ð/,"D");
-            gsub(/Ø/,"OE");
-            gsub(/Þ/,"TH");
-            gsub(/Æ/,"AE");
-            gsub(/[àáâãäåª]/,"a");
-            gsub(/[èéêë]/,"e");
-            gsub(/[ìíîï]/,"i");
-            gsub(/[òóôõöº]/,"o");
-            gsub(/[ùúûü]/,"u");
-            gsub(/[ýÿ]/,"y");
-            gsub(/ç/,"c");
-            gsub(/ñ/,"n");
-            gsub(/ð/,"d");
-            gsub(/ø/,"oe");
-            gsub(/þ/,"th");
-            gsub(/ae/,"ae");
-            gsub(/ß/,"ss");
-            # Replace non-ASCII with SUB
-            gsub(/[^\x00-\x7E]/,"\x1A");
+            $0 = toascii($0);
             break;
         case "lower":
             $0 = tolower($0);
@@ -136,6 +166,13 @@ NF {
         case "upper":
             $0 = toupper($0);
             break;
+        default:
+            continue;
+        }
+    }
+
+    for (o in options) {
+        switch (options[o]) {
         case "noalpha":
             gsub(/[[:alpha:]]+/,"");
             break;
