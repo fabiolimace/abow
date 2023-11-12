@@ -31,6 +31,8 @@ function letter_case(token)
         return "C"; # Capitalized: "Word", "Compound-word", "Compound-WORD" and "Compound-Word"
     case /^[[:upper:]]+(-([[:lower:]]+|[[:upper:]]+|[[:alpha:]][[:lower:]]+))*$/:
         return "U"; # Upper case: "WORD", "COMPOUND-word", "COMPOUND-WORD" and "COMPOUND-Word"
+    case /^[[:alpha:]]+(-([[:alpha:]]+))*$/:
+        return "M"; # Mixed case: "wOrD", "cOmPoUnD-wOrD"
     default:
         return "NA";
     }
