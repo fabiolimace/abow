@@ -31,6 +31,8 @@ function letter_case(token)
         return "F"; # First case: "Word", "Compound-wOrD"
     case /^[[:upper:]]+(-([[:alpha:]]+))*$/:
         return "U"; # Upper case: "WORD", "COMPOUND-wOrD"
+    case /^[[:alpha:]][[:lower:]]+([[:upper:]][[:lower:]]+)+$/:
+        return "C"; # Camel case: "compoundWord" "CompoundWord"
     case /^[[:alpha:]]+(-([[:alpha:]]+))*$/:
         return "M"; # Mixed case: "wOrD", "cOmPoUnD-wOrD"
     default:
