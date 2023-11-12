@@ -25,12 +25,12 @@ function character_class(token)
 function letter_case(token)
 {
     switch (token) {
-    case /^[[:lower:]]+(-([[:lower:]]+|[[:upper:]]+|[[:alpha:]][[:lower:]]+))*$/:
-        return "L"; # Lower case: "word", "compound-word", "compound-WORD" and "compound-Word"
-    case /^[[:upper:]][[:lower:]]*(-([[:lower:]]+|[[:upper:]]+|[[:alpha:]][[:lower:]]+))*$/:
-        return "C"; # Capitalized: "Word", "Compound-word", "Compound-WORD" and "Compound-Word"
-    case /^[[:upper:]]+(-([[:lower:]]+|[[:upper:]]+|[[:alpha:]][[:lower:]]+))*$/:
-        return "U"; # Upper case: "WORD", "COMPOUND-word", "COMPOUND-WORD" and "COMPOUND-Word"
+    case /^[[:lower:]]+(-([[:alpha:]]+))*$/:
+        return "L"; # Lower case: "word", "compound-wOrD"
+    case /^[[:upper:]][[:lower:]]*(-([[:alpha:]]+))*$/:
+        return "C"; # Capitalized: "Word", "Compound-wOrD"
+    case /^[[:upper:]]+(-([[:alpha:]]+))*$/:
+        return "U"; # Upper case: "WORD", "COMPOUND-wOrD"
     case /^[[:alpha:]]+(-([[:alpha:]]+))*$/:
         return "M"; # Mixed case: "wOrD", "cOmPoUnD-wOrD"
     default:
