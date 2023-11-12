@@ -69,7 +69,7 @@ Options:
 *   `nomixed`: remove mixed tokens (letters, digits and puncts mixed together)
 *   `nostopwords`: remove stop-word tokens (requires lang option)
 *   `asc=token`: ascending sort by `token` or `count`
-*   `dasc=token`: descending sort by `token` or `count`
+*   `desc=token`: descending sort by `token` or `count`
 
 Note that the locale's sorting order does not come into play; comparisons are based on character values only.
 
