@@ -7,7 +7,7 @@
 #    abw-process FILE [...]
 #    abw-process FILE [...] > OUTPUT
 #    abw-process -f token,count FILE [...]
-#    abw-process -o lower,ascii FILE [...]
+#    abw-process -o lang=pt,nostopwords,lower,ascii FILE [...]
 #
 
 declare -A options;
@@ -34,13 +34,13 @@ for i in $INPUT_FILES; do
     fi;
 done;
 
-if [[ ! ${options["f"]} =~ [[:alpha:],]* ]];
+if [[ ! ${options["f"]} =~ ^[[:alpha:],]*$ ]];
 then
     echo "abw-process.sh: $i: Invalid fields string" >> /dev/stderr;
     exit 1;
 fi;
 
-if [[ ! ${options["o"]} =~ [[:alpha:],]* ]];
+if [[ ! ${options["o"]} =~ ^[[:alpha:],=]*$ ]];
 then
     echo "abw-process.sh: $i: Invalid options string" >> /dev/stderr;
     exit 1;

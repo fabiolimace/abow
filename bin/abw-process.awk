@@ -100,37 +100,48 @@ function get_option(key) {
     return 0;
 }
 
-function get_stopwords_regex(lang,    stopwords_file, stopwords_regex, line) {
+function get_stopwords_regex(lang,    file, regex, line, word, optimize) {
 
-    stopwords_file=pwd "/../lib/lang/" lang "/stopwords.txt"
+    file=pwd "/../lib/lang/" lang "/stopwords.txt"
+    
+    if (get_option("ascii") || get_option("lower") || get_option("upper")) {
+        optimize = 1;
+    }
 
-    while((getline line < stopwords_file) > 0) {
+    while((getline line < file) > 0) {
 
         # skip line started with #
         if (line ~ /^[[:space:]]*$/ || line ~ /^#/) continue;
 
-        for (o in options) {
-            switch (options[o]) {
-            case "ascii":
-                line = toascii(line);
-                break;
-            case "lower":
-                line = tolower(line);
-                break;
-            case "upper":
-                line = toupper(line);
-                break;
-            default:
-                continue;
+        if (optimize) {
+            word=""
+            for (o in options) {
+                switch (options[o]) {
+                case "ascii":
+                    word = toascii(line);
+                    break;
+                case "lower":
+                    word = tolower(line);
+                    break;
+                case "upper":
+                    word = toupper(line);
+                    break;
+                default:
+                    continue;
+                }
             }
+        } else {
+            word= tolower(line) "|" toupper(substr(line, 1, 1)) tolower(substr(line, 2)) "|" toupper(line);
         }
-
-        if (stopwords_regex) stopwords_regex = stopwords_regex "|"
-        stopwords_regex=stopwords_regex line;
+        
+        regex=regex "|" word;
     }
 
-    if (!stopwords_regex) return "";
-    else return "\\<(" stopwords_regex ")\\>";
+    # remove leading pipe
+    regex=substr(regex,2);
+
+    if (!regex) return "";
+    else return "\\<(" regex ")\\>";
 }
 
 BEGIN {
@@ -140,7 +151,8 @@ BEGIN {
     split(OPTIONS,options,",");
 
     lang = get_option("lang");
-    stopwords_regex=get_stopwords_regex(lang);
+    
+    if (get_option("nostopwords")) stopwords_regex=get_stopwords_regex(lang);
 }
 
 NF {
