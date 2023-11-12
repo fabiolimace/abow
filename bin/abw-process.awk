@@ -28,7 +28,7 @@ function letter_case(token)
     case /^[[:lower:]]+(-([[:alpha:]]+))*$/:
         return "L"; # Lower case: "word", "compound-wOrD"
     case /^[[:upper:]][[:lower:]]*(-([[:alpha:]]+))*$/:
-        return "C"; # Capitalized: "Word", "Compound-wOrD"
+        return "F"; # First case: "Word", "Compound-wOrD"
     case /^[[:upper:]]+(-([[:alpha:]]+))*$/:
         return "U"; # Upper case: "WORD", "COMPOUND-wOrD"
     case /^[[:alpha:]]+(-([[:alpha:]]+))*$/:
@@ -38,7 +38,7 @@ function letter_case(token)
     }
     
     # NOTE:
-    # UPPERCASE words with a single character, for example "É", are treated as Capitalized words by this function.
+    # UPPERCASE words with a single character, for example "É", are treated as first case words by this function.
     # The author considers it a very convenient behavior that helps to identify proper nouns and the beginning of
     # sentences, although he admits that it may not be intuitive. The order of the switch cases is important to
     # preserve this behavior.
