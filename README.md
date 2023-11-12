@@ -45,12 +45,12 @@ abw --fields token,count FILE [...]
 Process files with a list of options:
 
 ```bash
-abw -o lang=pt,nostopwords,lower,ascii FILE [...]
+abw -o lang=pt,lower,ascii,nostopwords FILE [...]
 ```
 ```bash
-abw --options lang=pt,nostopwords,lower,ascii FILE [...]
+abw --options lang=pt,lower,ascii,nostopwords FILE [...]
 ```
-Process files with a list of options:
+
 Where:
 
 *   `FILE`: is a plain text file.
@@ -67,6 +67,10 @@ Options:
 *   `nopunct`: remove all-puncts tokens (punctuation)
 *   `nomixed`: remove mixed tokens (letters, digits and puncts mixed together)
 *   `nostopwords`: remove stop-word tokens (requires lang option)
+*   `asc=token`: ascending sort by `token` or `count`
+*   `dasc=token`: descending sort by `token` or `count`
+
+Note that the locale's sorting order does not come into play; comparisons are based on character values only.
 
 ### List files
 

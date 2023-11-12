@@ -144,6 +144,26 @@ function get_stopwords_regex(lang,    file, regex, line, word, optimize) {
     else return "\\<(" regex ")\\>";
 }
 
+function get_sort_order(    sort_order) {
+    sort_order="@unsorted"
+    for (o in options) {
+        switch (options[o]) {
+        case /^asc:/:
+            if (get_option("asc")=="token") sort_order="@ind_str_asc";
+            if (get_option("asc")=="count") sort_order="@val_num_asc";
+            break;
+        case /^desc:/:
+            if (get_option("desc")=="token") sort_order="@ind_str_desc";
+            if (get_option("desc")=="count") sort_order="@val_num_desc";
+            break;
+        default:
+            continue;
+        }
+    }
+    return sort_order;
+}
+
+
 BEGIN {
 
     pwd = PWD;
@@ -151,7 +171,7 @@ BEGIN {
     split(OPTIONS,options,",");
 
     lang = get_option("lang");
-    
+    sort_order=get_sort_order();
     if (get_option("nostopwords")) stopwords_regex=get_stopwords_regex(lang);
 }
 
@@ -227,48 +247,55 @@ END {
     default_fields="token,count,ratio,class,case,length,indexes";
     if (!length(fields)) split(default_fields, fields, ",");
 
+    sep=""
     for (f in fields) {
         if (default_fields ~ "\\<" fields[f] "\\>" ) {
-            printf "%s\t", toupper(fields[f]);
+            printf "%s%s", sep, toupper(fields[f]);
         }
+        sep="\t"
     }
     printf "\n";
     
+    PROCINFO["sorted_in"]=sort_order;
     for (token in counters) {
 
+        sep = ""
         count = counters[token];
         ratio = counters[token] / total;
 
+        PROCINFO["sorted_in"]="@unsorted"
         for (f in fields) {
             if (default_fields ~ "\\<" fields[f] "\\>" ) {
                 switch (fields[f]) {
                 case "token":
-                    printf "%s\t", token
+                    printf "%s%s", sep, token
                     break;
                 case "count":
-                    printf "%d\t", count
+                    printf "%s%d", sep, count
                     break;
                 case "ratio":
-                    printf "%.9f\t", ratio
+                    printf "%s%.9f", sep, ratio
                     break;
                 case "class":
-                    printf "%s\t", character_class(token)
+                    printf "%s%s", sep, character_class(token)
                     break;
                 case "case":
-                    printf "%s\t", letter_case(token)
+                    printf "%s%s", sep, letter_case(token)
                     break;
                 case "length":
-                    printf "%d\t", length(token)
+                    printf "%s%d", sep, length(token)
                     break;
                 case "indexes":
-                    printf "%s\t", join(indexes[token])
+                    printf "%s%s", sep, join(indexes[token])
                     break;
                 default:
                     continue;
                 }
             }
+            sep="\t"
         }
         printf "\n";
     }
+    PROCINFO["sorted_in"]="@unsorted"
 }
 

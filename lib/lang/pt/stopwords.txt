@@ -18,7 +18,8 @@ contra
 de
 desde
 em
-entre,para
+entre
+para
 per
 perante
 por
