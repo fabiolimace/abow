@@ -62,6 +62,7 @@ Options:
 *   `ascii`: convert to ASCII characters
 *   `lower`: convert to lower case characters
 *   `upper`: convert to upper case characters
+*   `noeol`: remove end of line token (`<EOL>`)
 *   `noalpha`: remove all-letters tokens (words)
 *   `nodigit`: remove all-digits tokens (numbers)
 *   `nopunct`: remove all-puncts tokens (punctuation)

@@ -171,6 +171,7 @@ BEGIN {
     split(OPTIONS,options,",");
 
     lang = get_option("lang");
+    eol = !get_option("noeol");
     sort_order=get_sort_order();
     if (get_option("nostopwords")) stopwords_regex=get_stopwords_regex(lang);
 }
@@ -229,7 +230,7 @@ NF {
         insert($i);
     }
 
-    insert("<EOL>");
+    if (eol) insert("<EOL>");
 }
 
 END {
