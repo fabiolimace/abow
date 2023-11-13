@@ -250,8 +250,18 @@ Fields:
 *   `TOKEN`: is a word, a punctuation symbol or a `<EOL>` symbol.
 *   `COUNT`: is the number of occurencies of the token in the text.
 *   `RATIO`: is the COUNT divided by the number of all tokens in the text.
-*   `CLASS`: is a POSIX character classes: 'A' for `[:alpha:]`, 'D' for `[:digit:]`, 'P' for `[:punct:]`, and 'NA' for none.
-*   `CASE`: is one of these letter cases: 'L' for lowercase, 'U' for uppercase, 'C' for capitalized word, and 'NA' for none.
+*   `CLASS`: is a POSIX character classes:
+    -   'A' for `[:alpha:]`, matching "word"
+    -   'D' for `[:digit:]`, matching "1234"
+    -   'P' for `[:punct:]`, matching "!?"
+    -   'NA' for none of the above.
+*   `CASE`: is one of these letter cases:
+    -   'L' for lower-case, matching "word" and "word-wOrd"
+    -   'U' for upper-case, matching "WORD" and "WORD-wOrd"
+    -   'S' for start-case, matching "Word" and "Word-wOrd"
+    -   'C' for camel-case, matching "wordWord" and "WordWord"
+    -   'O' for snake-case, matching "word_word" and "WORD_WORD"
+    -   'NA' for none of the above.
 *   `LENGTH`: is the number of characters in the token.
 *   `INDEXES`: is the comma-separated list of all positions of a token in the text.
 
