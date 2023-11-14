@@ -29,7 +29,7 @@ declare -A meta;
 declare -A size;
 
 if [[ ! -d "$DATADIR/$COLLECTION" ]]; then
-    echo "abw-list.sh: $COLLECTION: Collection not found" >> /dev/stderr;
+    echo "abw-list.sh: $COLLECTION: Collection not found" 1>&2;
     exit 1;
 fi;
 

@@ -29,7 +29,7 @@ function import_file {
     
     if [[ ! -f "$INPUT_FILE" ]];
     then
-        echo "abw-import.sh: $INPUT_FILE: File not found" >> /dev/stderr;
+        echo "abw-import.sh: $INPUT_FILE: File not found" 1>&2;
         return;
     fi;
     
@@ -43,7 +43,7 @@ function import_file {
     
     if [[ -d $ITEM && ! ${options["f"]} ]];
     then
-        echo "abw-import.sh: $INPUT_FILE: Fire already imported to '$COLLECTION/$SUID/'" >> /dev/stderr;
+        echo "abw-import.sh: $INPUT_FILE: Fire already imported to '$COLLECTION/$SUID/'" 1>&2;
         return;
     fi;
     
@@ -75,7 +75,7 @@ function import_directory {
     
     if [[ ! -d "$INPUT_FILE" ]];
     then
-        echo "abw-import.sh: $INPUT_FILE: Directory not found" >> /dev/stderr;
+        echo "abw-import.sh: $INPUT_FILE: Directory not found" 1>&2;
         return;
     fi;
 
@@ -94,7 +94,7 @@ function import_recursive {
     elif [[ -d "$INPUT_FILE" ]]; then
         import_directory "$COLLECTION" "$INPUT_FILE";
     else
-        echo "abw-import.sh: $INPUT_FILE: File or directory not found" >> /dev/stderr;
+        echo "abw-import.sh: $INPUT_FILE: File or directory not found" 1>&2;
         return;
     fi;
 }

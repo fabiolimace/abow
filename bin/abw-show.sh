@@ -27,7 +27,7 @@ SUID="${1}";
 COLLECTION="${options["c"]:-default}"
 
 if [[ ! -d "$DATADIR/$COLLECTION" ]]; then
-    echo "abw-show.sh: $COLLECTION: Directory not found" >> /dev/stderr;
+    echo "abw-show.sh: $COLLECTION: Directory not found" 1>&2;
     exit 1;
 fi;
 
