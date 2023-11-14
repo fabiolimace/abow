@@ -222,6 +222,16 @@ function change_tokens(options) {
     }
 }
 
+function basename(file) {
+    sub("^.*/", "", file)
+    return file
+}
+
+function basedir(file) {
+    sub("/[^/]+$", "", file)
+    return file
+}
+
 BEGIN {
 
     pwd = PWD;
@@ -232,6 +242,12 @@ BEGIN {
     eol = !get_option("noeol");
     sort_order=get_sort_order();
     if (get_option("nostopwords")) stopwords_regex=get_stopwords_regex(lang);
+}
+
+BEGINFILE {
+    total = 0;
+    delete counters;
+    delete indexes;
 }
 
 NF {
@@ -249,9 +265,16 @@ NF {
     if (eol) insert("<EOL>");
 }
 
-END {
+ENDFILE {
+
+    output=WRITETO;
+    filedir=basedir(FILENAME)
+    filename=basename(FILENAME)
+    sub(/:filedir/, filedir, output);
+    sub(/:filename/, filename, output);
 
     # start of operational checks #
+    sum=0
     for (k in counters) {
         sum += counters[k];
     }    
@@ -267,11 +290,11 @@ END {
     sep=""
     for (f in fields) {
         if (default_fields ~ "\\<" fields[f] "\\>" ) {
-            printf "%s%s", sep, toupper(fields[f]);
+            printf "%s%s", sep, toupper(fields[f]) > output;
         }
         sep="\t"
     }
-    printf "\n";
+    printf "\n" > output;
     
     PROCINFO["sorted_in"]=sort_order;
     for (token in counters) {
@@ -285,25 +308,25 @@ END {
             if (default_fields ~ "\\<" fields[f] "\\>" ) {
                 switch (fields[f]) {
                 case "token":
-                    printf "%s%s", sep, token
+                    printf "%s%s", sep, token > output;
                     break;
                 case "count":
-                    printf "%s%d", sep, count
+                    printf "%s%d", sep, count > output;
                     break;
                 case "ratio":
-                    printf "%s%.9f", sep, ratio
+                    printf "%s%.9f", sep, ratio > output;
                     break;
                 case "class":
-                    printf "%s%s", sep, character_class(token)
+                    printf "%s%s", sep, character_class(token) > output;
                     break;
                 case "case":
-                    printf "%s%s", sep, letter_case(token)
+                    printf "%s%s", sep, letter_case(token) > output;
                     break;
                 case "length":
-                    printf "%s%d", sep, length(token)
+                    printf "%s%d", sep, length(token) > output;
                     break;
                 case "indexes":
-                    printf "%s%s", sep, join(indexes[token])
+                    printf "%s%s", sep, join(indexes[token]) > output;
                     break;
                 default:
                     continue;
@@ -311,7 +334,7 @@ END {
             }
             sep="\t"
         }
-        printf "\n";
+        printf "\n" > output;
     }
     PROCINFO["sorted_in"]="@unsorted"
 }

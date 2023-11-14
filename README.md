@@ -24,13 +24,22 @@ abw -p FILE [...]
 abw --process FILE [...]
 ```
 
-Process files to an output file:
+Process files to an output file using redirection:
 
 ```bash
 abw -p FILE [...] > OUTPUT
 ```
 ```bash
 abw --process FILE [...] > OUTPUT
+```
+
+Process files to an output file command line argument:
+
+```bash
+abw --p -w OUTPUT FILE [...]
+```
+```bash
+abw --process --write-to OUTPUT FILE [...]
 ```
 
 Process files with a list of fields:
@@ -71,7 +80,34 @@ Options:
 *   `asc=token`: ascending sort by `token` or `count`
 *   `desc=token`: descending sort by `token` or `count`
 
-Note that the locale's sorting order does not come into play; comparisons are based on character values only.
+As to the `asc` and `desc` options, the locale's sorting order does not come into play; comparisons are based on character values only.
+
+#### Separate outputs
+
+The `--write-to` parameter allows to write separate output files for **each** input file. If you want to process three files, you can pass a generic output name, so that each input file will produce a separate output file. The generic output name can use one of these two placeholders: `:filedir` `:filename`.
+
+See these examples:
+
+```bash
+abw --process --write-to ':filedir/:filename.tsv' folder/file1.txt folder/file2.txt folder/file3.txt
+
+ls folder/
+'folder/file1.txt.tsv'
+'folder/file2.txt.tsv'
+'folder/file3.txt.tsv'
+```
+```bash
+abw --process --write-to ':filedir/output.tsv' folder1/file.txt folder2/file.txt folder3/file.txt
+
+ls folder*/
+'folder1/output.tsv'
+'folder2/output.tsv'
+'folder3/output.tsv'
+```
+
+Where:
+*   `:filedir`: is a placeholder to be replaced with the relative directory where the input file is.
+*   `:filename`: is a placeholder to be replaced with the name of the input file with the extension.
 
 ### List files
 

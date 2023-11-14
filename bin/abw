@@ -22,6 +22,7 @@
 #
 #    abw --process FILE [...]
 #    abw --process FILE [...] > OUTPUT
+#    abw --process --write-to OUTPUT FILE [...]
 #    abw --fields token,count FILE [...]
 #    abw --options lang=pt,nostopwords,lower,ascii FILE [...]
 #
@@ -46,6 +47,7 @@ args=${args//--show/-s}
 args=${args//--grep/-g}
 # process
 args=${args//--process/-p}
+args=${args//--write-to/-w}
 args=${args//--options/-o}
 args=${args//--fields/-f}
 # import
@@ -62,7 +64,7 @@ shopt -s extglob # remove unknown
 args=${args//--+([a-zA-Z0-9-])/-?}
 
 declare -A options;
-OPTSTRING="lsgpo:f:irc:vmdh"
+OPTSTRING="lsgpo:f:w:irc:vmdh"
 
 while getopts "$OPTSTRING" name ${args}; do
 
