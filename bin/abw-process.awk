@@ -48,11 +48,12 @@ function letter_case(token)
     # preserve this behavior.
 }
 
-function join(array,    i, result)
+function join(array, sep,    i, result)
 {
+    if (!sep) sep=",";
     for (i in array) {
         if (i == 1) result = array[i];
-        else result = result "," array[i];
+        else result = result sep array[i];
     }
     return result
 }
@@ -106,48 +107,23 @@ function get_option(key) {
     return 0;
 }
 
-function get_stopwords_regex(lang,    file, regex, line, word, optimize) {
+function get_stopwords_regex(lang,    file, regex, line) {
 
     file=pwd "/../lib/lang/" lang "/stopwords.txt"
-    
-    if (get_option("ascii") || get_option("lower") || get_option("upper")) {
-        optimize = 1;
-    }
-
+   
+    regex=""
     while((getline line < file) > 0) {
 
         # skip line started with #
         if (line ~ /^[[:space:]]*$/ || line ~ /^#/) continue;
 
-        if (optimize) {
-            word=""
-            for (o in options) {
-                switch (options[o]) {
-                case "ascii":
-                    word = toascii(line);
-                    break;
-                case "lower":
-                    word = tolower(line);
-                    break;
-                case "upper":
-                    word = toupper(line);
-                    break;
-                default:
-                    continue;
-                }
-            }
-        } else {
-            word= tolower(line) "|" toupper(substr(line, 1, 1)) tolower(substr(line, 2)) "|" toupper(line);
-        }
-        
-        regex=regex "|" word;
+        regex=regex "|" line;
     }
 
     # remove leading pipe
     regex=substr(regex,2);
 
-    if (!regex) return "";
-    else return "\\<(" regex ")\\>";
+    return regex;
 }
 
 function get_sort_order(    sort_order) {
@@ -169,6 +145,35 @@ function get_sort_order(    sort_order) {
     return sort_order;
 }
 
+# separates all tokens by spaces
+function separate_tokens (line) {
+
+    line=" " line " "; # add spaces at both sides to make escapes easier.
+    gsub(/ [\$€£@#]\</," \x1A&\x1A", line); # escape at the start of words:       `$` `€` `£` `@` `#`
+    gsub(/\>[\$¢°%] /,"\x1A&\x1A ", line); # escape at end of words:              `$` `¢` `°` `%`
+    gsub(/\>[\$@&\/.,':-]\</,"\x1A&\x1A", line); # escape in the middle of words.  `$` `@` `&` `/` `.` `,` `'` `:` `-`
+
+    line=gensub(/([[:punct:]])([[:punct:]])/,"\\1 \\2","g", line);
+    line=gensub(/([^\x1A ])([[:punct:]])/,"\\1 \\2","g", line);
+    line=gensub(/([[:punct:]])([^\x1A ])/,"\\1 \\2","g", line);
+
+    gsub(/\x1A/,"", line); # remove SUBSTITUTE characters (\x1A)
+    gsub(/[[:space:]]+/," ", line); # squeeze groups of spaces
+    gsub(/^[[:space:]]+|[[:space:]]+$/,"", line); # trim line
+
+    return line;
+}
+
+function remove_tokens(regex, line, invert,    tokens) {
+    split(line, tokens, " ");
+    for (i in tokens) {
+	IGNORECASE=1;
+        if (invert && tokens[i] !~ regex) tokens[i]="";
+        if (!invert && tokens[i] ~ regex) tokens[i]="";
+	IGNORECASE=0;
+    }
+    return join(tokens, " ");
+}
 
 BEGIN {
 
@@ -184,15 +189,7 @@ BEGIN {
 
 NF {
 
-    $0=" " $0 " "; # add spaces at both sides to make escapes easier.
-    gsub(/ [\$€£@#]\</," \x1A&\x1A"); # escape at the start of words:       `$` `€` `£` `@` `#`
-    gsub(/\>[\$¢°%] /,"\x1A&\x1A "); # escape at end of words:              `$` `¢` `°` `%`
-    gsub(/\>[\$@&/.,':-]\</,"\x1A&\x1A"); # escape in the middle of words.  `$` `@` `&` `/` `.` `,` `'` `:` `-`
-    
-    $0 = gensub(/([[:punct:]])([[:punct:]])/,"\\1 \\2","g");
-    $0 = gensub(/([^\x1A ])([[:punct:]])/,"\\1 \\2","g");
-    $0 = gensub(/([[:punct:]])([^\x1A ])/,"\\1 \\2","g");
-    gsub(/\x1A/,""); # remove all SUBSTITUTE characters (\x1A)
+    $0 = separate_tokens($0);
 
     for (o in options) {
         switch (options[o]) {
@@ -213,19 +210,19 @@ NF {
     for (o in options) {
         switch (options[o]) {
         case "noalpha":
-            gsub(/[[:alpha:]]+/,"");
+	    $0 = remove_tokens("^[[:alpha:]-]+$", $0);
             break;
         case "nodigit":
-            gsub(/[[:digit:]]+/,"");
+	    $0 = remove_tokens("^[[:digit:]]+$", $0);
             break;
         case "nopunct":
-            gsub(/[[:punct:]]+/,"");
+	    $0 = remove_tokens("^[[:punct:]]+$", $0);
             break;
         case "nomixed":
-            gsub(/([[:alpha:]]+([[:punct:][:digit:]]+[[:alpha:]]+)+|[[:digit:]]+([[:punct:][:alpha:]]+[[:digit:]]+)+)/,"");
+	    $0 = remove_tokens("^([[:alpha:]-]+|[[:digit:]]+|[[:punct:]]+)$", $0, 1);
             break;
         case "nostopwords":
-            gsub(stopwords_regex,"");
+	    $0 = remove_tokens("^(" stopwords_regex ")$", $0);
             break;
         default:
             continue;
