@@ -123,7 +123,7 @@ function get_stopwords_regex(lang,    file, regex, line) {
     # remove leading pipe
     regex=substr(regex,2);
 
-    return regex;
+    return "^(" regex ")$"
 }
 
 function get_sort_order(    sort_order) {
@@ -146,9 +146,9 @@ function get_sort_order(    sort_order) {
 }
 
 # separates all tokens by spaces
-function separate_tokens (line) {
+function separate_tokens (    line) {
 
-    line=" " line " "; # add spaces at both sides to make escapes easier.
+    line=" " $0 " "; # add spaces at both sides to make escapes easier.
     gsub(/ [\$€£@#]\</," \x1A&\x1A", line); # escape at the start of words:       `$` `€` `£` `@` `#`
     gsub(/\>[\$¢°%] /,"\x1A&\x1A ", line); # escape at end of words:              `$` `¢` `°` `%`
     gsub(/\>[\$@&\/.,':-]\</,"\x1A&\x1A", line); # escape in the middle of words.  `$` `@` `&` `/` `.` `,` `'` `:` `-`
@@ -161,18 +161,65 @@ function separate_tokens (line) {
     gsub(/[[:space:]]+/," ", line); # squeeze groups of spaces
     gsub(/^[[:space:]]+|[[:space:]]+$/,"", line); # trim line
 
-    return line;
+    $0 = line;
 }
 
-function remove_tokens(regex, line, invert,    tokens) {
-    split(line, tokens, " ");
-    for (i in tokens) {
-	IGNORECASE=1;
-        if (invert && tokens[i] !~ regex) tokens[i]="";
-        if (!invert && tokens[i] ~ regex) tokens[i]="";
-	IGNORECASE=0;
+function remove_tokens(options,    i) {
+
+    IGNORECASE=1;
+
+    for (o in options) {
+        switch (options[o]) {
+        case "noalpha":
+            for(i = 1; i <= NF; i++) {
+                if ($i ~ /^[[:alpha:]-]+$/) $i = "";
+            }
+            break;
+        case "nodigit":
+            for(i = 1; i <= NF; i++) {
+                if ($i ~ /^[[:digit:]]+$/) $i = "";
+            }
+            break;
+        case "nopunct":
+            for(i = 1; i <= NF; i++) {
+                if ($i ~ /^[[:punct:]]+$/) $i = "";
+            }
+            break;
+        case "nomixed":
+            for(i = 1; i <= NF; i++) {
+                if ($i !~ /^([[:alpha:]-]+|[[:digit:]]+|[[:punct:]]+)$/) $i = "";
+            }
+            break;
+        case "nostopwords":
+            for(i = 1; i <= NF; i++) {
+                if ($i ~ stopwords_regex) $i = "";
+            }
+            break;
+        default:
+            continue;
+        }
     }
-    return join(tokens, " ");
+    $0=$0 # force update
+
+    IGNORECASE=0;
+}
+
+function change_tokens(options) {
+    for (o in options) {
+        switch (options[o]) {
+        case "ascii":
+            $0 = toascii($0);
+            break;
+        case "lower":
+            $0 = tolower($0);
+            break;
+        case "upper":
+            $0 = toupper($0);
+            break;
+        default:
+            continue;
+        }
+    }
 }
 
 BEGIN {
@@ -189,45 +236,11 @@ BEGIN {
 
 NF {
 
-    $0 = separate_tokens($0);
+    separate_tokens();
 
-    for (o in options) {
-        switch (options[o]) {
-        case "ascii":
-            $0 = toascii($0);
-            break;
-        case "lower":
-            $0 = tolower($0);
-            break;
-        case "upper":
-            $0 = toupper($0);
-            break;
-        default:
-            continue;
-        }
-    }
+    change_tokens(options);
 
-    for (o in options) {
-        switch (options[o]) {
-        case "noalpha":
-	    $0 = remove_tokens("^[[:alpha:]-]+$", $0);
-            break;
-        case "nodigit":
-	    $0 = remove_tokens("^[[:digit:]]+$", $0);
-            break;
-        case "nopunct":
-	    $0 = remove_tokens("^[[:punct:]]+$", $0);
-            break;
-        case "nomixed":
-	    $0 = remove_tokens("^([[:alpha:]-]+|[[:digit:]]+|[[:punct:]]+)$", $0, 1);
-            break;
-        case "nostopwords":
-	    $0 = remove_tokens("^(" stopwords_regex ")$", $0);
-            break;
-        default:
-            continue;
-        }
-    }
+    remove_tokens(options);
 
     for (i = 1; i <= NF; i++) {
         insert($i);
