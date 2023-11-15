@@ -242,12 +242,24 @@ BEGIN {
     eol = !get_option("noeol");
     sort_order=get_sort_order();
     if (get_option("nostopwords")) stopwords_regex=get_stopwords_regex(lang);
+
+    available_fields="token,count,ratio,class,case,length,indexes";
+    if (!length(fields)) {
+	    split(available_fields, fields, ","); 
+    } else {
+	for (f in fields) {
+        	if (available_fields !~ "\\<" fields[f] "\\>" ) {
+			delete fields[f]
+        	}
+    	}
+    }
 }
 
 BEGINFILE {
     total = 0;
     delete counters;
     delete indexes;
+    delete records;
 }
 
 NF {
@@ -283,59 +295,62 @@ ENDFILE {
         exit 1;
     }
     # end of operational checks #
-
-    default_fields="token,count,ratio,class,case,length,indexes";
-    if (!length(fields)) split(default_fields, fields, ",");
-
-    sep=""
-    for (f in fields) {
-        if (default_fields ~ "\\<" fields[f] "\\>" ) {
-            printf "%s%s", sep, toupper(fields[f]) > output;
-        }
-        sep="\t"
-    }
-    printf "\n" > output;
-    
+  
+    row=0
     PROCINFO["sorted_in"]=sort_order;
     for (token in counters) {
 
+	row++;
         sep = ""
         count = counters[token];
         ratio = counters[token] / total;
 
         PROCINFO["sorted_in"]="@unsorted"
         for (f in fields) {
-            if (default_fields ~ "\\<" fields[f] "\\>" ) {
                 switch (fields[f]) {
                 case "token":
-                    printf "%s%s", sep, token > output;
+                    records[row][f] = sprintf("%s", token);
                     break;
                 case "count":
-                    printf "%s%d", sep, count > output;
+                    records[row][f] = sprintf("%d", count);
                     break;
                 case "ratio":
-                    printf "%s%.9f", sep, ratio > output;
+                    records[row][f] = sprintf("%.9f", ratio);
                     break;
                 case "class":
-                    printf "%s%s", sep, character_class(token) > output;
+                    records[row][f] = sprintf("%s", character_class(token));
                     break;
                 case "case":
-                    printf "%s%s", sep, letter_case(token) > output;
+                    records[row][f] = sprintf("%s", letter_case(token));
                     break;
                 case "length":
-                    printf "%s%d", sep, length(token) > output;
+                    records[row][f] = sprintf("%d", length(token));
                     break;
                 case "indexes":
-                    printf "%s%s", sep, join(indexes[token]) > output;
+                    records[row][f] = sprintf("%s", join(indexes[token]));
                     break;
                 default:
                     continue;
                 }
-            }
             sep="\t"
         }
-        printf "\n" > output;
     }
     PROCINFO["sorted_in"]="@unsorted"
+
+    sep=""
+    for (f in fields) {
+        printf "%s%s", sep, toupper(fields[f]) > output;
+        sep="\t"
+    }
+    printf "\n" > output;
+ 
+    for (r in records) {
+     	sep = ""
+	for (f in fields) {
+		printf "%s%s", sep, records[r][f] > output;
+		sep = "\t"
+	}
+        printf "\n" > output;
+    }
 }
 

@@ -10,9 +10,6 @@
 BASEDIR=`dirname $0`
 DATADIR="$BASEDIR/../data"
 
-# Equivalent to ASCII string: "3333333333333333"
-NAMESPACE="33333333-3333-3333-3333-333333333333";
-
 function hash {
     sha1sum ${1} | head -c 40
 }
@@ -41,7 +38,7 @@ function import_file {
     local META=$ITEM/meta.txt
     local DATA=$ITEM/data.tsv
     
-    if [[ -d $ITEM && ! ${options["f"]} ]];
+    if [[ -d $ITEM ]];
     then
         echo "abw-import.sh: $INPUT_FILE: Fire already imported to '$COLLECTION/$SUID/'" 1>&2;
         return;
@@ -61,7 +58,7 @@ function import_file {
     echo "mime=`file -bi $INPUT_FILE`" >> $META
     echo "size=`wc -c $INPUT_FILE | cut -d" " -f1`" >> $META
    
-    $BASEDIR/abw-process.sh -f -o $DATA $TEXT
+    $BASEDIR/abw-process.sh $TEXT > $DATA
     
     if [[ ${options["v"]} ]]; then
         echo "Imported '$INPUT_FILE' to '$COLLECTION/$SUID/'"
@@ -100,7 +97,7 @@ function import_recursive {
 }
 
 declare -A options;
-OPTSTRING="ic:rvfh"
+OPTSTRING="ic:rvh"
 
 while getopts "$OPTSTRING" name ${@}; do
       if [[ ${OPTARG} ]]; then
