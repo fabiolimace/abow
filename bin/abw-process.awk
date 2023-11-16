@@ -234,7 +234,7 @@ function basedir(file) {
     return file
 }
 
-function parse_confs(    file, line, string, override, i, j)
+function parse_confs(    file, line, string)
 {
     file=pwd "/../abw.conf"
    
@@ -255,42 +255,38 @@ function parse_confs(    file, line, string, override, i, j)
         parse_fields(string, fields);
     }
 
-    parse_options(string, options);
-    parse_options(OPTIONS, override);
-    for (i in override) {
-         for (j in options) {
-            if (override[i]["key"] == options[j]["key"])
-                options[j]["value"] = override[i]["value"]; 
-         }
+    parse_options(OPTIONS, options);
+    if (length(options) == 0) {
+        parse_options(string, options);
     }
 }
 
-function parse_fields(string, fields,    allowed_keys)
+function parse_fields(string, fields,    default_string)
 {
     gsub(":","=",string);
-    allowed_keys="token,type,count,ratio,format,case,length,indexes";
-    if (!string) string = allowed_keys;
-    parse_key_values(string, fields, allowed_keys);
+    default_string="token,type,count,ratio,format,case,length,indexes";
+    if (!string) string = default_string;
+    parse_key_values(string, fields, default_string);
 }
 
-function parse_options(string, options,    allowed_keys)
+function parse_options(string, options,    default_string)
 {
     gsub(":","=",string);
-    allowed_keys="ascii,lower,upper,stopwords,lang,eol,asc,desc";
-    if (!string) string = allowed_keys;
-    parse_key_values(string, options, allowed_keys);
+    default_string="ascii=0,lower=0,upper=0,stopwords=1,lang=none,eol=1,asc=none,desc=none";
+    if (!string) string = default_string;
+    parse_key_values(string, options, default_string); 
 }
 
 # Option formats: 'key' or 'key:value'
 # If the format is 'key', name is 'key' and value is '1'
 # If the format is 'key:value', name is 'key' and value is 'value'
-function parse_key_values(string, keyvalues,     allowed_keys, items, i, key, value, splitter)
+function parse_key_values(string, keyvalues,     default_string, items, i, key, value, splitter)
 {
     split(string, items, ",");
     for (i in items)
     {
         gsub(/=.*$/, "", items[i]);
-        if (allowed_keys !~ "\\<" items[i] "\\>") {
+        if (default_string !~ "\\<" items[i] "\\>") {
             gsub("\\<" items[i] "\\>(=[^,]*)?", "", string);
         }
     }
@@ -357,7 +353,7 @@ function transform_line()
             if (options[o]["value"] == 1) $0 = toupper($0);
             break;
         case "stopwords":
-            if (options[o]["value"] == 1) remove_stopwords();
+            if (options[o]["value"] == 0) remove_stopwords();
             break;
         default:
             continue;

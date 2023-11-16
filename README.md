@@ -72,11 +72,7 @@ Options:
 *   `lower`: convert to lower case characters
 *   `upper`: convert to upper case characters
 *   `noeol`: remove end of line token (`<EOL>`)
-*   `noalpha`: remove all-letters tokens (words)
-*   `nodigit`: remove all-digits tokens (numbers)
-*   `nopunct`: remove all-puncts tokens (punctuation)
-*   `nomixed`: remove mixed tokens (letters, digits and puncts mixed together)
-*   `nostopwords`: remove stop-word tokens (requires lang option)
+*   `stopwords`: remove stop-word tokens (requires lang option)
 *   `asc=token`: ascending sort by `token` or `count`
 *   `desc=token`: descending sort by `token` or `count`
 
@@ -284,11 +280,12 @@ The `data.tsv` file is a tab-separated value file containing a bag of words.
 Fields:
 
 *   `TOKEN`: is a word, a punctuation symbol or a `<EOL>` symbol.
+*   `TYPE`: is the token type -- the result of `toascii(tolower(token))`.
 *   `COUNT`: is the number of occurencies of the token in the text.
 *   `RATIO`: is the COUNT divided by the number of all tokens in the text.
-*   `CLASS`: is a POSIX character classes:
-    -   'A' for `[:alpha:]`, matching "word"
-    -   'D' for `[:digit:]`, matching "1234"
+*   `FORMAT`: is a POSIX character classes:
+    -   'W' for `[:alpha:]`, matching "word"
+    -   'N' for `[:digit:]`, matching "1234"
     -   'P' for `[:punct:]`, matching "!?"
     -   'NA' for none of the above.
 *   `CASE`: is one of these letter cases:
@@ -296,14 +293,13 @@ Fields:
     -   'U' for upper-case, matching "WORD" and "WORD-wOrd"
     -   'S' for start-case, matching "Word" and "Word-wOrd"
     -   'C' for camel-case, matching "wordWord" and "WordWord"
-    -   'O' for snake-case, matching "word_word" and "WORD_WORD"
     -   'NA' for none of the above.
 *   `LENGTH`: is the number of characters in the token.
 *   `INDEXES`: is the comma-separated list of all positions of a token in the text.
 
 Where:
 
-*   `<EOL>`: is a symbol for the end of line.
+*   `<eol>`: is a symbol for the end of line.
 *   'NA': is a missing value borrowed from R language.
 
 The fields shown in the output is controlled by passing a list of `--fields`.
