@@ -42,13 +42,13 @@ for i in $INPUT_FILES; do
     fi;
 done;
 
-if [[ ! ${options["f"]} =~ ^[[:alpha:],]*$ ]];
+if [[ ! ${options["f"]} =~ ^[[:alnum:],=]*$ ]];
 then
-    echo "abw-process.sh: Invalid fields string" 1>&2;
+    echo "abw-process.sh: Invalid fields string x" 1>&2;
     exit 1;
 fi;
 
-if [[ ! ${options["o"]} =~ ^[[:alpha:],=]*$ ]];
+if [[ ! ${options["o"]} =~ ^[[:alnum:],=]*$ ]];
 then
     echo "abw-process.sh: Invalid options string" 1>&2;
     exit 1;

@@ -4,17 +4,22 @@
 #   * Files encoded using MAC-UTF-8 must be normalized to UTF-8.
 #   * Non-breakin spaces (NBSP, 0xA0) must be converted to regular spaces.
 
-function character_class(token)
+function token_type(token)
+{
+    return toascii(tolower(token));
+}
+
+function token_format(token)
 {
     switch (token) {
     case /^[[:alpha:]-]+$/:
-        return "A"; # Alpha (with hyphen)
+        return "W"; # Word format: all-letter token (with hyphen)
     case /^[[:digit:]]+$/:
-        return "D"; # Digit (only)
+        return "N"; # Number format: all-digit token
     case /^[[:punct:]]+$/:
-        return "P"; # Punct (only)
+        return "P"; # Punct format: all-punct token
     default:
-        return "M"; # Mixed (alpha, digit, and punct)
+        return "NA"; # None of the above
     }
     
     # NOTE:
@@ -22,7 +27,7 @@ function character_class(token)
     # with MAC-UTF-8. You must normilize the input files to regular UTF-8 encoding.
 }
 
-function letter_case(token)
+function token_case(token)
 {
     switch (token) {
     case /^[[:lower:]]+(-([[:alpha:]]+))*$/:
@@ -31,14 +36,12 @@ function letter_case(token)
         return "S"; # Start case: "Word", "Compound-wOrD"
     case /^[[:upper:]]+(-([[:alpha:]]+))*$/:
         return "U"; # Upper case: "WORD", "COMPOUND-wOrD"
-    case /^[[:alpha:]][[:lower:]]+([[:upper:]][[:lower:]]+)+$/:
+    case /^[[:upper:]]?[[:lower:]]+([[:upper:]][[:lower:]]+)+$/:
         return "C"; # Camel case: "compoundWord", "CompoundWord"
-    case /^([[:lower:]]+(_[[:lower:]]+)+|[[:upper:]]+(_[[:upper:]]+)+)$/:
-        return "O"; # Snake case: "compound_word", "COMPOUND_WORD"
     case /^[[:alpha:]]+(-([[:alpha:]]+))*$/:
         return "M"; # Mixed case: "wOrD", "cOmPoUnD-wOrD"
     default:
-        return "NA";
+        return "NA"; # None of the above
     }
     
     # NOTE:
@@ -48,20 +51,18 @@ function letter_case(token)
     # preserve this behavior.
 }
 
-function join(array, sep,    i, result)
+function insert_token(token)
 {
-    if (!sep) sep=",";
-    for (i in array) {
-        if (i == 1) result = array[i];
-        else result = result sep array[i];
-    }
-    return result
-}
-
-function insert(token) {
-    total++;
+    idx++;
+    tokens[idx]=token;
     counters[token]++;
-    indexes[token][counters[token]]=total;
+
+    if (!types[token]) types[token] = token_type(token);
+    if (!formats[token]) formats[token] = token_format(token);
+    if (!cases[token]) cases[token] = token_case(token);
+
+    if (!indexes[token]) indexes[token] = idx;
+    else indexes[token] = indexes[token] "," idx;
 }
 
 function toascii(string) {
@@ -99,15 +100,11 @@ function toascii(string) {
     return string;
 }
 
-function get_option(key) {
-    for (o in options) {
-        if (options[o] ~ "^" key "$") return 1;
-        if (options[o] ~ "^" key ":") return substr(options[o], index(options[o], ":") + 1);
-    }
-    return 0;
-}
+function get_stopwords_regex(    file, regex, line) {
 
-function get_stopwords_regex(lang,    file, regex, line) {
+    if (!option_value("stopwords")) {
+        return /^$/;
+    }
 
     file=pwd "/../lib/lang/" lang "/stopwords.txt"
    
@@ -126,32 +123,13 @@ function get_stopwords_regex(lang,    file, regex, line) {
     return "^(" regex ")$"
 }
 
-function get_sort_order(    sort_order) {
-    sort_order="@unsorted"
-    for (o in options) {
-        switch (options[o]) {
-        case /^asc:/:
-            if (get_option("asc")=="token") sort_order="@ind_str_asc";
-            if (get_option("asc")=="count") sort_order="@val_num_asc";
-            break;
-        case /^desc:/:
-            if (get_option("desc")=="token") sort_order="@ind_str_desc";
-            if (get_option("desc")=="count") sort_order="@val_num_desc";
-            break;
-        default:
-            continue;
-        }
-    }
-    return sort_order;
-}
-
 # separates all tokens by spaces
-function separate_tokens (    line) {
+function separate_tokens() {
 
-    line=" " $0 " "; # add spaces at both sides to make escapes easier.
+    line=" " $0 " "; # add spaces at both sides to make tokenization easier.
     gsub(/ [\$€£@#]\</," \x1A&\x1A", line); # escape at the start of words:       `$` `€` `£` `@` `#`
     gsub(/\>[\$¢°%] /,"\x1A&\x1A ", line); # escape at end of words:              `$` `¢` `°` `%`
-    gsub(/\>[\$@&\/.,':-]\</,"\x1A&\x1A", line); # escape in the middle of words.  `$` `@` `&` `/` `.` `,` `'` `:` `-`
+    gsub(/\>[\$@&\/.,':-]\</,"\x1A&\x1A", line); # escape in the middle of words. `$` `@` `&` `/` `.` `,` `'` `:` `-`
 
     line=gensub(/([[:punct:]])([[:punct:]])/,"\\1 \\2","g", line);
     line=gensub(/([^\x1A ])([[:punct:]])/,"\\1 \\2","g", line);
@@ -164,60 +142,84 @@ function separate_tokens (    line) {
     $0 = line;
 }
 
-function remove_tokens(options,    i) {
+function generate_records(    count, ratio, sum, sep, row, f, k)
+{    
+    # start of operational checks #
+    sum=0
+    for (k in counters) {
+        sum += counters[k];
+    }    
+    if (sum != length(tokens)) {
+        print "Wrong sum of counts" > "/dev/stderr";
+        exit 1;
+    }
+    # end of operational checks #
+ 
+    row=0
+    PROCINFO["sorted_in"]=sort_order;
+    for (token in counters) {
 
-    IGNORECASE=1;
+    	row++;
+        sep = ""
+        count = counters[token];
+        ratio = count / length(tokens);
 
-    for (o in options) {
-        switch (options[o]) {
-        case "noalpha":
-            for(i = 1; i <= NF; i++) {
-                if ($i ~ /^[[:alpha:]-]+$/) $i = "";
-            }
-            break;
-        case "nodigit":
-            for(i = 1; i <= NF; i++) {
-                if ($i ~ /^[[:digit:]]+$/) $i = "";
-            }
-            break;
-        case "nopunct":
-            for(i = 1; i <= NF; i++) {
-                if ($i ~ /^[[:punct:]]+$/) $i = "";
-            }
-            break;
-        case "nomixed":
-            for(i = 1; i <= NF; i++) {
-                if ($i !~ /^([[:alpha:]-]+|[[:digit:]]+|[[:punct:]]+)$/) $i = "";
-            }
-            break;
-        case "nostopwords":
-            for(i = 1; i <= NF; i++) {
-                if ($i ~ stopwords_regex) $i = "";
-            }
-            break;
-        default:
-            continue;
+        PROCINFO["sorted_in"]="@unsorted"
+        for (f in fields) {
+                if (fields[f]["value"] == 0) continue;
+                switch (fields[f]["key"]) {
+                case "token":
+                    records[row]["token"] = token;
+                    break;
+                case "type":
+                    records[row]["type"]= types[token];
+                    break;
+                case "count":
+                    records[row]["count"] = count;
+                    break;
+                case "ratio":
+                    records[row]["ratio"] = ratio;
+                    break;
+                case "format":
+                    records[row]["format"] = formats[token];
+                    break;
+                case "case":
+                    records[row]["case"] = cases[token];
+                    break;
+                case "length":
+                    records[row]["length"] = length(token);
+                    break;
+                case "indexes":
+                    records[row]["indexes"] = indexes[token];
+                    break;
+                default:
+                    continue;
+                }
+            sep="\t"
         }
     }
-    $0=$0 # force update
-
-    IGNORECASE=0;
+    PROCINFO["sorted_in"]="@unsorted"
 }
 
-function change_tokens(options) {
-    for (o in options) {
-        switch (options[o]) {
-        case "ascii":
-            $0 = toascii($0);
-            break;
-        case "lower":
-            $0 = tolower($0);
-            break;
-        case "upper":
-            $0 = toupper($0);
-            break;
-        default:
-            continue;
+function print_records(    r, f, sep)
+{
+    if (length(records)) {
+        sep = ""
+        for (f in fields) {
+            if (fields[f]["value"] == 0) continue;
+            printf "%s%s", sep, toupper(fields[f]["key"]) > output;
+            sep = "\t"
+        }
+        printf "\n" > output;
+
+        for (r in records) {
+         	sep = ""
+        	for (f in fields) {
+                if (fields[f]["value"] == 0) continue;
+    	    	printf "%s%s", sep, records[r][fields[f]["key"]] > output;
+    		    sep = "\t"
+    	    }
+            printf "\n" > output;
         }
     }
 }
@@ -232,49 +234,177 @@ function basedir(file) {
     return file
 }
 
-BEGIN {
+function parse_confs(    file, line, string, override, i, j)
+{
+    file=pwd "/../abw.conf"
+   
+    string=""
+    while((getline line < file) > 0) {
 
-    pwd = PWD;
-    split(FIELDS,fields,",");
-    split(OPTIONS,options,",");
+        # skip comments 
+        gsub(/#.*$/,"", line);
 
-    lang = get_option("lang");
-    eol = !get_option("noeol");
-    sort_order=get_sort_order();
-    if (get_option("nostopwords")) stopwords_regex=get_stopwords_regex(lang);
+        # skip invalid lines
+        if (line !~ /^[[:space:]]*[[:alnum:]]+[[:space:]]*=[[:space:]]*[[:alnum:]]+[[:space:]]*$/) continue;
+        if (!string) string = line;
+        else string=string "," line;
+    }
 
-    available_fields="token,count,ratio,class,case,length,indexes";
-    if (!length(fields)) {
-	    split(available_fields, fields, ","); 
-    } else {
-	for (f in fields) {
-        	if (available_fields !~ "\\<" fields[f] "\\>" ) {
-			delete fields[f]
-        	}
-    	}
+    parse_fields(FIELDS, fields);
+    if (length(fields) == 0) {
+        parse_fields(string, fields);
+    }
+
+    parse_options(string, options);
+    parse_options(OPTIONS, override);
+    for (i in override) {
+         for (j in options) {
+            if (override[i]["key"] == options[j]["key"])
+                options[j]["value"] = override[i]["value"]; 
+         }
     }
 }
 
+function parse_fields(string, fields,    allowed_keys)
+{
+    gsub(":","=",string);
+    allowed_keys="token,type,count,ratio,format,case,length,indexes";
+    if (!string) string = allowed_keys;
+    parse_key_values(string, fields, allowed_keys);
+}
+
+function parse_options(string, options,    allowed_keys)
+{
+    gsub(":","=",string);
+    allowed_keys="ascii,lower,upper,stopwords,lang,eol,asc,desc";
+    if (!string) string = allowed_keys;
+    parse_key_values(string, options, allowed_keys);
+}
+
+# Option formats: 'key' or 'key:value'
+# If the format is 'key', name is 'key' and value is '1'
+# If the format is 'key:value', name is 'key' and value is 'value'
+function parse_key_values(string, keyvalues,     allowed_keys, items, i, key, value, splitter)
+{
+    split(string, items, ",");
+    for (i in items)
+    {
+        gsub(/=.*$/, "", items[i]);
+        if (allowed_keys !~ "\\<" items[i] "\\>") {
+            gsub("\\<" items[i] "\\>(=[^,]*)?", "", string);
+        }
+    }
+
+    gsub(",+", ",", string);
+    gsub("^,|,$", "", string);
+
+    split(string, items, ",");
+    for (i in items)
+    {
+        if (items[i] !~ "=" ) {
+            key = items[i];
+            value = 1;
+        } else {
+            splitter = index(items[i], "=");
+            key = substr(items[i], 0, splitter - 1);
+            value = substr(items[i], splitter + 1);
+        }
+        keyvalues[i]["key"] = key;
+        keyvalues[i]["value"] = value;
+    }
+}
+
+function get_sort_order(    sort_order)
+{
+    sort_order="@unsorted"
+    for (o in options) {
+        switch (options[o]["key"]) {
+        case "asc":
+            if (options[o]["value"] == "token") sort_order = "@ind_str_asc";
+            if (options[o]["value"] == "count") sort_order = "@val_num_asc";
+            break;
+        case "desc":
+            if (options[o]["value"] == "token") sort_order = "@ind_str_desc";
+            if (options[o]["value"] == "count") sort_order = "@val_num_desc";
+            break;
+        default:
+            continue;
+        }
+    }
+    return sort_order;
+}
+
+function remove_stopwords(    i)
+{
+    IGNORECASE=1;
+    for (i = 1; i <= NF; i++) {
+        if ($i ~ stopwords_regex) $i = "";
+    }
+    IGNORECASE=0;
+}
+
+function transform_line()
+{
+    for (o in options) {
+        switch (options[o]["key"]) {
+        case "ascii":
+            if (options[o]["value"] == 1) $0 = toascii($0);
+            break;
+        case "lower":
+            if (options[o]["value"] == 1) $0 = tolower($0);
+            break;
+        case "upper":
+            if (options[o]["value"] == 1) $0 = toupper($0);
+            break;
+        case "stopwords":
+            if (options[o]["value"] == 1) remove_stopwords();
+            break;
+        default:
+            continue;
+        }
+    }
+}
+
+function option_value(key,    o) {
+    for (o in options) {
+        if (options[o]["key"] == key) return options[o]["value"];
+    }
+    return 0;
+}
+
+BEGIN {
+
+    pwd = PWD;
+    parse_confs();
+
+    eol = option_value("eol");
+    lang = option_value("lang");
+
+    sort_order = get_sort_order();
+    stopwords_regex = get_stopwords_regex();
+}
+
 BEGINFILE {
-    total = 0;
+    idx = 0;
+    delete tokens;
+    delete types;
     delete counters;
+    delete formats;
+    delete cases;
     delete indexes;
     delete records;
 }
 
 NF {
 
+    transform_line();
     separate_tokens();
 
-    change_tokens(options);
-
-    remove_tokens(options);
-
     for (i = 1; i <= NF; i++) {
-        insert($i);
+        insert_token($i);
     }
 
-    if (eol) insert("<EOL>");
+    if (eol) insert_token("<eol>");
 }
 
 ENDFILE {
@@ -284,73 +414,10 @@ ENDFILE {
     filename=basename(FILENAME)
     sub(/:filedir/, filedir, output);
     sub(/:filename/, filename, output);
-
-    # start of operational checks #
-    sum=0
-    for (k in counters) {
-        sum += counters[k];
-    }    
-    if (sum != total) {
-        print "Wrong sum of counts" > "/dev/stderr";
-        exit 1;
-    }
-    # end of operational checks #
-  
-    row=0
-    PROCINFO["sorted_in"]=sort_order;
-    for (token in counters) {
-
-	row++;
-        sep = ""
-        count = counters[token];
-        ratio = counters[token] / total;
-
-        PROCINFO["sorted_in"]="@unsorted"
-        for (f in fields) {
-                switch (fields[f]) {
-                case "token":
-                    records[row][f] = sprintf("%s", token);
-                    break;
-                case "count":
-                    records[row][f] = sprintf("%d", count);
-                    break;
-                case "ratio":
-                    records[row][f] = sprintf("%.9f", ratio);
-                    break;
-                case "class":
-                    records[row][f] = sprintf("%s", character_class(token));
-                    break;
-                case "case":
-                    records[row][f] = sprintf("%s", letter_case(token));
-                    break;
-                case "length":
-                    records[row][f] = sprintf("%d", length(token));
-                    break;
-                case "indexes":
-                    records[row][f] = sprintf("%s", join(indexes[token]));
-                    break;
-                default:
-                    continue;
-                }
-            sep="\t"
-        }
-    }
-    PROCINFO["sorted_in"]="@unsorted"
-
-    sep=""
-    for (f in fields) {
-        printf "%s%s", sep, toupper(fields[f]) > output;
-        sep="\t"
-    }
-    printf "\n" > output;
  
-    for (r in records) {
-     	sep = ""
-	for (f in fields) {
-		printf "%s%s", sep, records[r][f] > output;
-		sep = "\t"
-	}
-        printf "\n" > output;
-    }
+    generate_records();
+    print_records();
+
 }
+
 
