@@ -71,8 +71,8 @@ Options:
 *   `ascii`: convert to ASCII characters
 *   `lower`: convert to lower case characters
 *   `upper`: convert to upper case characters
-*   `noeol`: remove end of line token (`<EOL>`)
-*   `stopwords`: remove stop-word tokens (requires lang option)
+*   `eol`: keep end of line token (`<eol>`)
+*   `stopwords`: keep stop-word tokens (requires lang option)
 *   `asc=token`: ascending sort by `token` or `count`
 *   `desc=token`: descending sort by `token` or `count`
 
