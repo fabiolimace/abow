@@ -67,8 +67,7 @@ function insert_token(token)
 
 function toascii(string) {
 
-    # Transliterate Unicode
-    # Latin-1 Supplement chars
+    # Unicode Latin-1 Supplement
     gsub(/[ÀÁÂÃÄÅ]/,"A", string);
     gsub(/[ÈÉÊË]/,"E", string);
     gsub(/[ÌÍÎÏ]/,"I", string);
@@ -94,6 +93,10 @@ function toascii(string) {
     gsub(/þ/,"th", string);
     gsub(/ae/,"ae", string);
     gsub(/ß/,"ss", string);
+
+    # Windows-1252 specials
+    gsub(/ß/,"ss", string);
+
     # Replace non-ASCII with SUB (0x1A)
     gsub(/[^\x00-\x7E]/,"\x1A", string);
 

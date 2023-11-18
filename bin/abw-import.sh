@@ -51,13 +51,13 @@ function import_file {
     echo "collection=$COLLECTION" > $META
     echo "suid=$SUID" >> $META
     echo "uuid=$UUID" >> $META
-    echo "path=$INPUT_FILE" >> $META
+    echo "path=`realpath $INPUT_FILE`" >> $META
     echo "name=`basename $INPUT_FILE`" >> $META
     echo "hash=$HASH" >> $META
     echo "date=`date '+%F %T'`" >> $META
     echo "mime=`file -bi $INPUT_FILE`" >> $META
-    echo "size=`wc -c $INPUT_FILE | cut -d" " -f1`" >> $META
-   
+    wc -lwcm "$INPUT_FILE" | awk '{ printf "lines=%d\nwords=%d\nbytes=%d\nchars=%d\n", $1, $2, $3, $4; }' >> $META
+
     $BASEDIR/abw-process.sh $TEXT > $DATA
     
     if [[ ${options["v"]} ]]; then
