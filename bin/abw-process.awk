@@ -136,9 +136,9 @@ function separate_tokens() {
     line=gensub(/([[:punct:]])([[:punct:]])/,"\\1 \\2","g", line);
     line=gensub(/([[:punct:]])([[:punct:]])/,"\\1 \\2","g", line);
     
-    # Protect some puncts right before words: [ `#` `@` `$` `%` `&` `°` `+` `-` ]
+    # Protect some puncts right before words: [ `.` ] and [ `#` `@` `$` `%` `&` `°` `+` `-` ]
     # The SUBSTITUTE character is used here to protect the list of puncts above.
-    line=gensub(/([[:space:]])([\x23@$%&°+-]+)/,"\\1\x1A\\2","g", line);
+    line=gensub(/([[:space:]])([.\x23@$%&°+-]+)/,"\\1\x1A\\2","g", line);
     
     # Protect some puncts right after words: [ `#` `@` `$` `%` `&` `°` `+` `-` ]
     # The SUBSTITUTE character is used here to protect the list of puncts above.
