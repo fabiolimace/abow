@@ -126,33 +126,16 @@ function get_stopwords_regex(    file, regex, line) {
     return "^(" regex ")$"
 }
 
-# separates all tokens by spaces
+# separates tokens by spaces
 function separate_tokens() {
 
-    line=" " $0 " "; # Add spaces at both sides to make the tokenization easier.
+    line=" " $0 " ";
     
-    # Separate all puncts from each other.
-    # It must be done twice and before the other operations.
-    line=gensub(/([[:punct:]])([[:punct:]])/,"\\1 \\2","g", line);
-    line=gensub(/([[:punct:]])([[:punct:]])/,"\\1 \\2","g", line);
-    
-    # Protect some puncts right before words: [ `.` ] and [ `#` `@` `$` `%` `&` `°` `+` `-` ]
-    # The SUBSTITUTE character is used here to protect the list of puncts above.
-    line=gensub(/([[:space:]])([.\x23@$%&°+-]+)/,"\\1\x1A\\2","g", line);
-    
-    # Protect some puncts right after words: [ `#` `@` `$` `%` `&` `°` `+` `-` ]
-    # The SUBSTITUTE character is used here to protect the list of puncts above.
-    line=gensub(/([\x23@$%&°+-]+)([[:space:]])/,"\\1\x1A\\2","g", line);
-
-    # Separate all the other puncts in the start of words.
-    line=gensub(/([[:space:]][[:punct:]]+)/,"\\1 ","g", line);
-    
-    # Separate all the other puncts in the end of words.
-    line=gensub(/([[:punct:]]+[[:space:]])/," \\1","g", line);
-
-    gsub(/\x1A/,"", line); # Remove all SUBSTITUTE characters
-    gsub(/[[:space:]]+/," ", line); # Squeeze groups of spaces
-    gsub(/^[[:space:]]+|[[:space:]]+$/,"", line); # trim line
+    line=gensub(/([\(\)\[\]\{\}])/, " \\1 ", "g", line);
+    line=gensub(/([^,;:.…!?])([,;:.…!?][[:punct:]]*[[:space:]])/, "\\1 \\2", "g", line);
+    line=gensub(/([^[:alnum:]])([\x22\x27“”‘’«»])([[:alnum:][:punct:]])/, "\\1 \\2 \\3", "g", line);
+    line=gensub(/([[:alnum:][:punct:]])([\x22\x27“”‘’«»])([^[:alnum:]])/, "\\1 \\2 \\3", "g", line);
+    line=gensub(/([[:space:]][[:alpha:]]{2,})\/([[:alpha:]]{2,}[[:space:]])/, "\\1 / \\2", "g", line);
     
     $0 = line;
 }
