@@ -1,0 +1,11 @@
+collection=default
+uuid=56ee7f08-19f5-831a-8e43-44c27882b954
+hash=56ee7f0819f5831a5e4344c27882b95448d7a667
+path=/home/usuario/Desenvolvimento/git/abw/samples/sample2.txt
+name=sample2.txt
+date=2024-03-13 08:50:49
+mime=text/plain; charset=utf-8
+lines=11
+words=257
+bytes=1721
+chars=1772

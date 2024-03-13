@@ -53,6 +53,8 @@ args=${args//--fields/-f}
 # import
 args=${args//--import/-i}
 args=${args//--recursive/-r}
+# check
+args=${args//--check/-k}
 # generic
 args=${args//--collection/-c}
 args=${args//--verbose/-v}
@@ -64,7 +66,7 @@ shopt -s extglob # remove unknown
 args=${args//--+([a-zA-Z0-9-])/-?}
 
 declare -A options;
-OPTSTRING="lsgpo:f:w:irc:vmdh"
+OPTSTRING="lsgpo:f:w:irkc:vmdh"
 
 while getopts "$OPTSTRING" name ${args}; do
 
@@ -86,6 +88,8 @@ elif [[ ${options["p"]} ]]; then
     $BASEDIR/abw-process.sh ${args}
 elif [[ "${options["i"]}" ]]; then
     $BASEDIR/abw-import.sh ${args}
+elif [[ "${options["k"]}" ]]; then
+    $BASEDIR/abw-check.sh ${args}
 else
     echo "abw: missing or invalid arguments";
     exit 1;

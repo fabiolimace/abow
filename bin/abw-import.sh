@@ -7,17 +7,8 @@
 #    abw-import -r -c COLLECTION DIRECTORY [...]
 #
 
-BASEDIR=`dirname $0`
-DATADIR="$BASEDIR/../data"
-
-function hash {
-    sha1sum ${1} | head -c 40
-}
-
-function uuid {
-    # Generate a UUIDv8 using the file hash. UUIDv8 is custom and free-form UUID
-    printf "%s-%s-%s%s-%s%s-%s\n" ${1:0:8} ${1:8:4} '8' ${1:13:3} '8' ${1:17:3} ${1:20:12}
-}
+OPTSTRING="ic:rvh"
+source ./abw-common.sh
 
 function import_file {
 
@@ -30,30 +21,35 @@ function import_file {
         return;
     fi;
     
-    local HASH=`hash "$INPUT_FILE"`
-    local UUID=`uuid "$HASH"`
-    local SUID=`echo $UUID | cut -d- -f1`
-    local ITEM=$DATADIR/$COLLECTION/$SUID/$UUID;
-    local TEXT=$ITEM/text.txt
-    local META=$ITEM/meta.txt
-    local DATA=$ITEM/data.tsv
-    
-    if [[ -d $ITEM ]];
+    if [[ ! -s "$INPUT_FILE" ]];
     then
-        echo "abw-import.sh: $INPUT_FILE: Fire already imported to '$COLLECTION/$SUID/'" 1>&2;
+        echo "abw-import.sh: $INPUT_FILE: File is empty" 1>&2;
         return;
     fi;
     
-    mkdir --parents $ITEM;
+    local HASH=`hash "$INPUT_FILE"`
+    local UUID=`uuid "$HASH"`
+    local ROAD=`road "$COLLECTION" "$UUID"`;
+    local TEXT=$ROAD/text.txt
+    local META=$ROAD/meta.txt
+    local DATA=$ROAD/data.tsv
+    
+    if [[ -d $ROAD ]];
+    then
+        echo "abw-import.sh: $INPUT_FILE: Fire already imported" 1>&2;
+        return;
+    fi;
+    
+    mkdir --parents $ROAD;
     
     cp $INPUT_FILE $TEXT
     
-    echo "collection=$COLLECTION" > $META
-    echo "suid=$SUID" >> $META
+    echo -n > $META
+    echo "collection=$COLLECTION" >> $META
     echo "uuid=$UUID" >> $META
+    echo "hash=$HASH" >> $META
     echo "path=`realpath $INPUT_FILE`" >> $META
     echo "name=`basename $INPUT_FILE`" >> $META
-    echo "hash=$HASH" >> $META
     echo "date=`date '+%F %T'`" >> $META
     echo "mime=`file -bi $INPUT_FILE`" >> $META
     wc -lwcm "$INPUT_FILE" | awk '{ printf "lines=%d\nwords=%d\nbytes=%d\nchars=%d\n", $1, $2, $3, $4; }' >> $META
@@ -61,7 +57,7 @@ function import_file {
     $BASEDIR/abw-process.sh $TEXT > $DATA
     
     if [[ ${options["v"]} ]]; then
-        echo "Imported '$INPUT_FILE' to '$COLLECTION/$SUID/'"
+        echo "Imported '$INPUT_FILE'"
     fi;
 }
 
@@ -95,18 +91,6 @@ function import_recursive {
         return;
     fi;
 }
-
-declare -A options;
-OPTSTRING="ic:rvh"
-
-while getopts "$OPTSTRING" name ${@}; do
-      if [[ ${OPTARG} ]]; then
-        options[${name}]=${OPTARG};
-      else
-        options[${name}]=${name};
-      fi;
-done;
-shift $(( ${OPTIND} - 1 ));
 
 while (( $# )) ; do
 

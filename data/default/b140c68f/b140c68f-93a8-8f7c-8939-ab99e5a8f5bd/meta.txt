@@ -1,9 +1,0 @@
-collection=default
-suid=b140c68f
-uuid=b140c68f-93a8-8f7c-8939-ab99e5a8f5bd
-path=samples/sample1.txt
-name=sample1.txt
-hash=b140c68f93a8ff7c9939ab99e5a8f5bd1743f47c
-date=2023-11-03 17:21:50
-mime=text/plain; charset=utf-8
-size=2050

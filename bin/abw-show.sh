@@ -2,43 +2,34 @@
 #
 # Usage:
 #
-#    abw-show SUID
-#    abw-show -c COLLECTION SUID
-#    abw-show -c COLLECTION -m SUID
-#    abw-show -c COLLECTION -d SUID
+#    abw-show UUID
+#    abw-show -c COLLECTION UUID
+#    abw-show -c COLLECTION -m UUID
+#    abw-show -c COLLECTION -d UUID
 #
 
-BASEDIR=`dirname $0`
-DATADIR="$BASEDIR/../data"
-
-declare -A options;
 OPTSTRING="sc:md"
+source ./abw-common.sh
 
-while getopts "$OPTSTRING" name ${@}; do
-      if [[ ${OPTARG} ]]; then
-        options[${name}]=${OPTARG};
-      else
-        options[${name}]=${name};
-      fi;
-done;
-shift $(( ${OPTIND} - 1 ));
-
-SUID="${1}";
+UUID="${1}";
 COLLECTION="${options["c"]:-default}"
+ROAD=`road "$COLLECTION" "$UUID"`;
 
 if [[ ! -d "$DATADIR/$COLLECTION" ]]; then
-    echo "abw-show.sh: $COLLECTION: Directory not found" 1>&2;
+    echo "abw-show.sh: $COLLECTION: Collection not found" 1>&2;
     exit 1;
 fi;
 
-for i in `ls $DATADIR/$COLLECTION/$SUID/`; do
+if [[ ! -d "$ROAD" ]]; then
+    echo "abw-show.sh: $UUID: UUID not found" 1>&2;
+    exit 1;
+fi;
 
-    if [[ ${options["m"]} ]]; then
-        cat $DATADIR/$COLLECTION/$SUID/$i/meta.txt
-    elif [[ ${options["d"]} ]]; then
-        cat $DATADIR/$COLLECTION/$SUID/$i/data.tsv
-    else
-        cat $DATADIR/$COLLECTION/$SUID/$i/text.txt
-    fi;
-done;
+if [[ ${options["m"]} ]]; then
+    cat "$ROAD/meta.txt"
+elif [[ ${options["d"]} ]]; then
+    cat "$ROAD/data.tsv"
+else
+    cat "$ROAD/text.txt"
+fi;
 

@@ -11,17 +11,8 @@
 #    abw-process -o lang=pt,nostopwords,lower,ascii FILE [...]
 #
 
-declare -A options;
 OPTSTRING="po:f:w:"
-
-while getopts "$OPTSTRING" name ${@}; do
-      if [[ ${OPTARG} ]]; then
-        options[${name}]=${OPTARG};
-      else
-        options[${name}]=${name};
-      fi;
-done;
-shift $(( ${OPTIND} - 1 ));
+source ./abw-common.sh
 
 INPUT_FILES="${@}"
 FIELDS="-v FIELDS=${options["f"]}"

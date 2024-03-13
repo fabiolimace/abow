@@ -128,10 +128,10 @@ abw --list --collection COLLECTION
 List files of a collection selecting some metadata fields:
 
 ```bash
-abw -l -c COLLECTION -m "suid,collection,name,size,date"
+abw -l -c COLLECTION -m "uuid,collection,name,size,date"
 ```
 ```bash
-abw --list --collection COLLECTION --meta "suid,collection,name,size,date"
+abw --list --collection COLLECTION --meta "uuid,collection,name,size,date"
 ```
 
 ### Show files
@@ -139,28 +139,28 @@ abw --list --collection COLLECTION --meta "suid,collection,name,size,date"
 Show a `text.txt` file:
 
 ```bash
-abw -s SHORT_ID
+abw -s UUID
 ```
 ```bash
-abw --show SHORT_ID
+abw --show UUID
 ```
 
 Show a `meta.txt` file:
 
 ```bash
-abw -s -m SHORT_ID
+abw -s -m UUID
 ```
 ```bash
-abw --show --meta SHORT_ID
+abw --show --meta UUID
 ```
 
 Show a `data.tsv` file:
 
 ```bash
-abw -s -d SHORT_ID
+abw -s -d UUID
 ```
 ```bash
-abw --show --data SHORT_ID
+abw --show --data UUID
 ```
 
 ### Search in files
@@ -246,12 +246,12 @@ tree data
 ```
 data
 └── default
-    ├── 25cc123e
+    ├── 25/cc/
     │   └── 25cc123e-66c5-35ac-8b32-bc8ef803abdf
     │       ├── data.tsv
     │       ├── meta.txt
     │       └── text.txt
-    └── 80a7c9ab
+    └── 80/a7/
         └── 80a7c9ab-8f0c-31ab-9f72-251367cf6557
             ├── data.tsv
             ├── meta.txt
@@ -267,10 +267,10 @@ Where:
 And where:
 
 *   `default`: is the default collection name.
-*   `25cc123e`: is a short ID to derived from the file's UUIDv8.
+*   `25/cc/`: is a subdirectory to support more than 21845.33 (2^16/3) per directory on VFAT file system.
 *   `25cc123e-66c5-35ac-8b32-bc8ef803abdf`: is a UUIDv8 derived from the file content.
 
-The short ID is just an abbreviated form of the UUIDv8. It is not meant to be globally unique, not even in a collection scope.
+The maximum number of files per directory on VFAT is 21845.33 (2^16/3). The maximum number of entries is 2^16 on VFAT. Each file on VFAT occupies at least 3 entries: 1 entry for short name (DOS compatible), and at least 2 entries for 2 long name (up to 20 entries = 255 chars).
 
 The `data.tsv` file
 ------------------------------------------------------

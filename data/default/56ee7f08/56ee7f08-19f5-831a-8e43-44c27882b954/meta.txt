@@ -1,9 +1,0 @@
-collection=default
-suid=56ee7f08
-uuid=56ee7f08-19f5-831a-8e43-44c27882b954
-path=samples/sample2.txt
-name=sample2.txt
-hash=56ee7f0819f5831a5e4344c27882b95448d7a667
-date=2023-11-03 17:21:50
-mime=text/plain; charset=utf-8
-size=1772
