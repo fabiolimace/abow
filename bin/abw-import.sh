@@ -23,10 +23,9 @@ function database_create {
     
     sqlite3 "$DATABASE" <<EOF
 CREATE TABLE text_ (uuid_ TEXT PRIMARY KEY, content_ TEXT);
-CREATE TABLE data_ (uuid_ TEXT PRIMARY KEY, token_ TEXT, type_ TEXT, count_ INTEGER, ratio_ REAL, format_ TEXT, case_ TEXT, length_ INTEGER, indexes_ TEXT);
 CREATE TABLE meta_ (uuid_ TEXT PRIMARY KEY, hash_ TEXT, name_ TEXT, path_ TEXT, mime_ TEXT, date_ INTEGER, lines_ INTEGER, words_ INTEGER, bytes_ INTEGER, chars_ INTEGER);
+CREATE TABLE data_ (uuid_ TEXT, token_ TEXT, type_ TEXT, count_ INTEGER, ratio_ REAL, format_ TEXT, case_ TEXT, length_ INTEGER, indexes_ TEXT);
 CREATE UNIQUE INDEX text_index_ on text_ (uuid_);
-CREATE UNIQUE INDEX data_index_ on data_ (uuid_);
 CREATE UNIQUE INDEX meta_index_ on meta_ (uuid_);
 EOF
 
@@ -60,8 +59,27 @@ function database_import_meta {
     sqlite3 "$DATABASE" "INSERT INTO meta_ (uuid_, hash_, name_, path_, mime_, date_, lines_, words_, bytes_, chars_) values ('$UUID', '$HASH', '$NAME', '$LANE', '$MIME', '$DATE', '$LINES', '$WORDS', '$BYTES', '$CHARS');";
 }
 
+
 function database_import_data {
-    echo # TODO
+    local COLLECTION="${1}"
+    local DATA="${2}"
+    local UUID="${3}"
+    local DATABASE=`database $COLLECTION`
+
+    while read -r LINE; do
+    
+        if [[ -z "$HEAD" ]];
+        then
+            local HEAD="$LINE"
+        fi;
+    
+        HEAD=`echo -n $HEAD | sed -E "s/\s/_,/g"`;
+        LINE=`echo -n $LINE | sed -E "s/\s/','/g"`;
+        
+        sqlite3 "$DATABASE" "INSERT INTO data_ (uuid_, ${HEAD}_) values ('$UUID', '${LINE}');";
+        
+    done < "$DATA";
+
 }
 
 function import_file {
@@ -117,6 +135,7 @@ function import_file {
     if [[ ${options["v"]} ]]; then
         echo "Imported '$INPUT_FILE'"
     fi;
+    database_import_data $COLLECTION $DATA $UUID
 }
 
 function import_directory {
