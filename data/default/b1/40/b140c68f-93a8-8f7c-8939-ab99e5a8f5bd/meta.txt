@@ -1,10 +1,10 @@
 collection=default
 uuid=b140c68f-93a8-8f7c-8939-ab99e5a8f5bd
 hash=b140c68f93a8ff7c9939ab99e5a8f5bd1743f47c
-path=/home/usuario/Desenvolvimento/git/abw/samples/sample1.txt
 name=sample1.txt
-date=2024-03-13 08:50:49
+path=/home/usuario/Desenvolvimento/git/abw/samples/sample1.txt
 mime=text/plain; charset=utf-8
+date=2024-03-13 17:40:50
 lines=21
 words=328
 bytes=2000
