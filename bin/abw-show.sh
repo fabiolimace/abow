@@ -9,7 +9,7 @@
 #
 
 OPTSTRING="sc:md"
-source ./abw-common.sh
+source `dirname $0`/abw-common.sh
 
 UUID="${1}";
 COLLECTION="${options["c"]:-default}"

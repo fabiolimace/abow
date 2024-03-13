@@ -7,7 +7,7 @@
 #
 
 OPTSTRING="kc:"
-source ./abw-common.sh
+source `dirname $0`/abw-common.sh
 
 function checksum {
 
@@ -15,7 +15,7 @@ function checksum {
     local META="$ROAD/meta.txt"
     local TEXT="$ROAD/text.txt"
     
-    local HASH=`get_meta_value "$META" "hash"`
+    local HASH=`meta_value "$META" "hash"`
     
     if [ -z "$HASH" ];
     then

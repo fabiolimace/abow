@@ -9,7 +9,7 @@
 
 
 OPTSTRING="lc:m:"
-source ./abw-common.sh
+source `dirname $0`/abw-common.sh
 
 COLLECTION="${options["c"]:-default}";
 METAFIELDS="${options["m"]:=uuid,collection,name,bytes,date}"

@@ -12,7 +12,7 @@
 #
 
 OPTSTRING="po:f:w:"
-source ./abw-common.sh
+source `dirname $0`/abw-common.sh
 
 INPUT_FILES="${@}"
 FIELDS="-v FIELDS=${options["f"]}"

@@ -9,7 +9,7 @@
 #
 
 OPTSTRING="gc:md"
-source ./abw-common.sh
+source `dirname $0`/abw-common.sh
 
 REGEX="${1}";
 COLLECTION="${options["c"]:-default}"

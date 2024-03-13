@@ -7,7 +7,7 @@
 # Usage:
 # 
 #     OPTSTRING="abcd:efg:h"
-#     source ./abw-common.sh
+#     source `dirname $0`/abw-common.sh
 #
 
 BASEDIR=`dirname $0`
@@ -55,9 +55,14 @@ function road {
     printf "$DATADIR/%s/%s/%s/%s" "${COLLECTION}" "${UUID:0:2}" "${UUID:2:2}" "${UUID}";
 }
 
-function get_meta_value {
-    local META_FILE="${1}"
+function meta_value {
+    local META="${1}"
     local KEY="${2}"
-    grep "$KEY=" "$META_FILE" | cut -d= -f2
+    grep -F "$KEY=" "$META" | sed -E "s/$KEY=//"
+}
+
+function database {
+    local COLLECTION=${1}
+    echo "$DATADIR/$COLLECTION.db"
 }
 
