@@ -87,8 +87,9 @@ function import_text_db {
     local CONTENT=`cat "$INPUT_FILE"`
     
     create_database "$DATABASE"
-
-    sqlite3 "$DATABASE" "INSERT INTO text_ values ('$UUID', '$CONTENT');"; # TODO: escape the content
+    
+    CONTENT=${CONTENT//\'/\'\'}; # escape quotes for SQLite
+    sqlite3 "$DATABASE" "INSERT INTO text_ values ('$UUID', '$CONTENT');"; # FIXME: /usr/bin/sqlite3: Lista de argumentos muito longa
 }
 
 function import_meta_fs {
@@ -144,7 +145,9 @@ function import_meta_db {
     
     local DATABASE=`database $COLLECTION`
     
-    sqlite3 "$DATABASE" "INSERT INTO meta_ values ('$UUID', '$HASH', '$NAME', '$ROAD', '$MIME', '$DATE', '$LINES', '$WORDS', '$BYTES', '$CHARS');";  # TODO: escape the strings
+    NAME=${NAME//\'/\'\'}; # escape quotes for SQLite
+    ROAD=${ROAD//\'/\'\'}; # escape quotes for SQLite
+    sqlite3 "$DATABASE" "INSERT INTO meta_ values ('$UUID', '$HASH', '$NAME', '$ROAD', '$MIME', '$DATE', '$LINES', '$WORDS', '$BYTES', '$CHARS');";
 }
 
 function import_data_fs {
@@ -168,7 +171,7 @@ function import_data_db {
     local DATABASE=`database $COLLECTION`
 
     # TODO: selected fields by options
-    $BASEDIR/abw-process.sh $INPUT_FILE | awk 'BEGIN {printf "BEGIN DEFERRED TRANSACTION;\n"} NR > 1 { printf "INSERT INTO data_ values '"('$UUID', '%s', '%s', %d, %f, '%s', '%s', %d, '%s');\n"'", $1, $2, $3, $4, $5, $6, $7, $8, $9 } END {printf "COMMIT TRANSACTION;\n"}' | sqlite3 "$DATABASE" # TODO: escape the strings
+    $BASEDIR/abw-process.sh $INPUT_FILE | sed "s/'/''/g" | awk 'BEGIN { printf "BEGIN DEFERRED TRANSACTION;\n"} NR > 1 { printf "INSERT INTO data_ values '"('$UUID', '%s', '%s', %d, %f, '%s', '%s', %d, '%s');\n"'", $1, $2, $3, $4, $5, $6, $7, $8, $9 } END {printf "COMMIT TRANSACTION;\n"}' | sqlite3 "$DATABASE"
 }
 
 function import_file {
