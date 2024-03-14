@@ -48,21 +48,20 @@ function uuid {
     printf "%s-%s-%s%s-%s%s-%s" ${HASH:0:8} ${HASH:8:4} '8' ${HASH:13:3} '8' ${HASH:17:3} ${HASH:20:12}
 }
 
-# get file path
-function road {
+function directory {
     local COLLECTION=${1}
     local UUID=${2}
     printf "$DATADIR/%s/%s/%s/%s" "${COLLECTION}" "${UUID:0:2}" "${UUID:2:2}" "${UUID}";
+}
+
+function database {
+    local COLLECTION=${1}
+    echo "$DATADIR/$COLLECTION.db"
 }
 
 function meta_value {
     local META="${1}"
     local KEY="${2}"
     grep -F "$KEY=" "$META" | sed -E "s/$KEY=//"
-}
-
-function database {
-    local COLLECTION=${1}
-    echo "$DATADIR/$COLLECTION.db"
 }
 

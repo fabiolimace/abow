@@ -11,10 +11,14 @@ OPTSTRING="ic:rvh"
 source `dirname $0`/abw-common.sh
 
 
-function database_create {
+function create_directory {
+    local DIRECTORY="${1}"
+    mkdir --parents $DIRECTORY;
+}
 
-    local COLLECTION=${1}
-    local DATABASE=`database $COLLECTION`
+function create_database {
+
+    local DATABASE="${1}"
     
     if [ -f "$DATABASE" ];
     then
@@ -23,63 +27,118 @@ function database_create {
     
     sqlite3 "$DATABASE" <<EOF
 CREATE TABLE text_ (uuid_ TEXT PRIMARY KEY, content_ TEXT);
-CREATE TABLE meta_ (uuid_ TEXT PRIMARY KEY, hash_ TEXT, name_ TEXT, path_ TEXT, mime_ TEXT, date_ INTEGER, lines_ INTEGER, words_ INTEGER, bytes_ INTEGER, chars_ INTEGER);
-CREATE TABLE data_ (uuid_ TEXT, token_ TEXT, type_ TEXT, count_ INTEGER, ratio_ REAL, format_ TEXT, case_ TEXT, length_ INTEGER, indexes_ TEXT);
-CREATE UNIQUE INDEX text_index_ on text_ (uuid_);
-CREATE UNIQUE INDEX meta_index_ on meta_ (uuid_);
+CREATE TABLE meta_ (uuid_ TEXT PRIMARY KEY, hash_ TEXT, name_ TEXT, path_ TEXT, mime_ TEXT, date_ INTEGER, lines_ INTEGER, words_ INTEGER, bytes_ INTEGER, chars_ INTEGER, CONSTRAINT meta_fk_ FOREIGN KEY (uuid_) REFERENCES text_ (uuid_));
+CREATE TABLE data_ (uuid_ TEXT, token_ TEXT, type_ TEXT, count_ INTEGER, ratio_ REAL, format_ TEXT, case_ TEXT, length_ INTEGER, indexes_ TEXT, CONSTRAINT data_pk_ PRIMARY KEY (uuid_, token_), CONSTRAINT data_fk_ FOREIGN KEY (uuid_) REFERENCES text_ (uuid_));
 EOF
 
 }
 
-function database_import_text {
-    local COLLECTION="${1}"
-    local TEXT="${2}"
-    local UUID="${3}"
-    local CONTENT=`cat "$TEXT"`
-    local DATABASE=`database $COLLECTION`
+function import_text_fs {
 
-    sqlite3 "$DATABASE" "INSERT INTO text_ (uuid_, content_) values ('$UUID', '$CONTENT');";
+    local COLLECTION="${1}"
+    local INPUT_FILE="${2}"
+    local UUID="${3}"
+    
+    local DIRECTORY=`directory "$COLLECTION" "$UUID"`
+    local OUTPUT_FILE="$DIRECTORY/text.txt"
+    
+    create_directory "$DIRECTORY";
+    
+    cp $INPUT_FILE $OUTPUT_FILE;
 }
 
-function database_import_meta {
-    local COLLECTION="${1}"
-    local META="${2}"
-    local UUID="${3}"
-    local HASH="`meta_value "$META" 'hash'`"
-    local NAME="`meta_value "$META" 'name'`"
-    local LANE="`meta_value "$META" 'path'`"
-    local MIME="`meta_value "$META" 'mime'`"
-    local DATE="`meta_value "$META" 'date'`"
-    local LINES="`meta_value "$META" 'lines'`"
-    local WORDS="`meta_value "$META" 'words'`"
-    local BYTES="`meta_value "$META" 'bytes'`"
-    local CHARS="`meta_value "$META" 'chars'`"
-    local DATABASE=`database $COLLECTION`
+function import_text_db {
     
-    sqlite3 "$DATABASE" "INSERT INTO meta_ (uuid_, hash_, name_, path_, mime_, date_, lines_, words_, bytes_, chars_) values ('$UUID', '$HASH', '$NAME', '$LANE', '$MIME', '$DATE', '$LINES', '$WORDS', '$BYTES', '$CHARS');";
+    local COLLECTION="${1}"
+    local INPUT_FILE="${2}"
+    local UUID="${3}"
+    
+    local DATABASE=`database $COLLECTION`
+    local CONTENT=`cat "$INPUT_FILE"`
+    
+    create_database "$DATABASE"
+
+    sqlite3 "$DATABASE" "INSERT INTO text_ values ('$UUID', '$CONTENT');"; # TODO: escape the content
 }
 
+function import_meta_fs {
 
-function database_import_data {
     local COLLECTION="${1}"
-    local DATA="${2}"
+    local INPUT_FILE="${2}"
     local UUID="${3}"
+    local HASH="${4}"
+    
+    local NAME=`basename $INPUT_FILE`
+    local ROAD=`realpath $INPUT_FILE` # alias for PATH
+    local MIME=`file -bi $INPUT_FILE`
+    local DATE=`date '+%F %T'`
+    local COUNT=`wc -lwcm "$INPUT_FILE" | awk '{ printf "%d\t%d\t%d\t%d\n", $1, $2, $3, $4; }'`
+    local LINES=`echo "$COUNT" | cut -f 1`
+    local WORDS=`echo "$COUNT" | cut -f 2`
+    local BYTES=`echo "$COUNT" | cut -f 3`
+    local CHARS=`echo "$COUNT" | cut -f 4`
+    
+    local DIRECTORY=`directory "$COLLECTION" "$UUID"`
+    local OUTPUT_FILE="$DIRECTORY/meta.txt"
+    
+    echo -n > $OUTPUT_FILE
+    echo "collection=$COLLECTION" >> $OUTPUT_FILE
+    echo "uuid=$UUID" >> $OUTPUT_FILE
+    echo "hash=$HASH" >> $OUTPUT_FILE
+    echo "name=$NAME" >> $OUTPUT_FILE
+    echo "path=$ROAD" >> $OUTPUT_FILE # TODO: change to the relative path inside the collection
+    echo "mime=$MIME" >> $OUTPUT_FILE
+    echo "date=$DATE" >> $OUTPUT_FILE
+    echo "lines=$LINES" >> $OUTPUT_FILE
+    echo "words=$WORDS" >> $OUTPUT_FILE
+    echo "bytes=$BYTES" >> $OUTPUT_FILE
+    echo "chars=$CHARS" >> $OUTPUT_FILE
+}
+
+function import_meta_db {
+
+    local COLLECTION="${1}"
+    local INPUT_FILE="${2}"
+    local UUID="${3}"
+    local HASH="${4}"
+    
+    local NAME=`basename $INPUT_FILE`
+    local ROAD=`realpath $INPUT_FILE`
+    local MIME=`file -bi $INPUT_FILE`
+    local DATE=`date '+%F %T'`
+    local COUNT=`wc -lwcm "$INPUT_FILE" | awk '{ printf "%d\t%d\t%d\t%d\n", $1, $2, $3, $4; }'`
+    local LINES=`echo "$COUNT" | cut -f 1`
+    local WORDS=`echo "$COUNT" | cut -f 2`
+    local BYTES=`echo "$COUNT" | cut -f 3`
+    local CHARS=`echo "$COUNT" | cut -f 4`
+    
+    local DATABASE=`database $COLLECTION`
+    
+    sqlite3 "$DATABASE" "INSERT INTO meta_ values ('$UUID', '$HASH', '$NAME', '$ROAD', '$MIME', '$DATE', '$LINES', '$WORDS', '$BYTES', '$CHARS');";  # TODO: escape the strings
+}
+
+function import_data_fs {
+
+    local COLLECTION="${1}"
+    local INPUT_FILE="${2}"
+    local UUID="${3}"
+    
+    local DIRECTORY=`directory "$COLLECTION" "$UUID"`
+    local OUTPUT_FILE="$DIRECTORY/data.txt"
+    
+    $BASEDIR/abw-process.sh $INPUT_FILE > $OUTPUT_FILE
+}
+
+function import_data_db {
+
+    local COLLECTION="${1}"
+    local INPUT_FILE="${2}"
+    local UUID="${3}"
+    
     local DATABASE=`database $COLLECTION`
 
-    while read -r LINE; do
-    
-        if [[ -z "$HEAD" ]];
-        then
-            local HEAD="$LINE"
-        fi;
-    
-        HEAD=`echo -n $HEAD | sed -E "s/\s/_,/g"`;
-        LINE=`echo -n $LINE | sed -E "s/\s/','/g"`;
-        
-        sqlite3 "$DATABASE" "INSERT INTO data_ (uuid_, ${HEAD}_) values ('$UUID', '${LINE}');";
-        
-    done < "$DATA";
-
+    # TODO: selected fields by options
+    $BASEDIR/abw-process.sh $INPUT_FILE | awk 'BEGIN {printf "BEGIN DEFERRED TRANSACTION;\n"} NR > 1 { printf "INSERT INTO data_ values '"('$UUID', '%s', '%s', %d, %f, '%s', '%s', %d, '%s');\n"'", $1, $2, $3, $4, $5, $6, $7, $8, $9 } END {printf "COMMIT TRANSACTION;\n"}' | sqlite3 "$DATABASE" # TODO: escape the strings
 }
 
 function import_file {
@@ -101,41 +160,19 @@ function import_file {
     
     local HASH=`hash "$INPUT_FILE"`
     local UUID=`uuid "$HASH"`
-    local ROAD=`road "$COLLECTION" "$UUID"`;
-    local TEXT=$ROAD/text.txt
-    local META=$ROAD/meta.txt
-    local DATA=$ROAD/data.tsv
-    local SQLI=
     
-    if [[ -d $ROAD ]];
-    then
-        echo "abw-import.sh: $INPUT_FILE: Fire already imported" 1>&2;
-        return;
-    fi;
+    import_text_fs "$COLLECTION" "$INPUT_FILE" "$UUID"
+    import_text_db "$COLLECTION" "$INPUT_FILE" "$UUID"
     
-    mkdir --parents $ROAD;
-    database_create "$COLLECTION"
+    import_meta_fs "$COLLECTION" "$INPUT_FILE" "$UUID" "$HASH"
+    import_meta_db "$COLLECTION" "$INPUT_FILE" "$UUID" "$HASH"
     
-    cp $INPUT_FILE $TEXT
-    database_import_text $COLLECTION $TEXT $UUID
-    
-    echo -n > $META
-    echo "collection=$COLLECTION" >> $META
-    echo "uuid=$UUID" >> $META
-    echo "hash=$HASH" >> $META
-    echo "name=`basename $INPUT_FILE`" >> $META
-    echo "path=`realpath $INPUT_FILE`" >> $META
-    echo "mime=`file -bi $INPUT_FILE`" >> $META
-    echo "date=`date '+%F %T'`" >> $META
-    wc -lwcm "$INPUT_FILE" | awk '{ printf "lines=%d\nwords=%d\nbytes=%d\nchars=%d\n", $1, $2, $3, $4; }' >> $META
-    database_import_meta $COLLECTION $META $UUID
-
-    $BASEDIR/abw-process.sh $TEXT > $DATA
+    import_data_fs "$COLLECTION" "$INPUT_FILE" "$UUID"
+    import_data_db "$COLLECTION" "$INPUT_FILE" "$UUID"
     
     if [[ ${options["v"]} ]]; then
         echo "Imported '$INPUT_FILE'"
     fi;
-    database_import_data $COLLECTION $DATA $UUID
 }
 
 function import_directory {
