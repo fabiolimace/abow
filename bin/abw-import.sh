@@ -7,7 +7,7 @@
 #    abw-import -r -c COLLECTION DIRECTORY [...]
 #
 
-OPTSTRING="ic:rvh"
+OPTSTRING="ic:idrvh"
 source `dirname $0`/abw-common.sh
 
 
@@ -31,6 +31,36 @@ CREATE TABLE meta_ (uuid_ TEXT PRIMARY KEY, hash_ TEXT, name_ TEXT, path_ TEXT, 
 CREATE TABLE data_ (uuid_ TEXT, token_ TEXT, type_ TEXT, count_ INTEGER, ratio_ REAL, format_ TEXT, case_ TEXT, length_ INTEGER, indexes_ TEXT, CONSTRAINT data_pk_ PRIMARY KEY (uuid_, token_), CONSTRAINT data_fk_ FOREIGN KEY (uuid_) REFERENCES text_ (uuid_))  STRICT;
 EOF
 
+}
+
+function exists_text_fs {
+
+    local COLLECTION="${1}"
+    local UUID="${2}"
+    
+    local DIRECTORY=`directory "$COLLECTION" "$UUID"`
+    
+    if [ ! -d "$DIRECTORY" ];
+    then
+        return;
+    fi;
+    
+    find "$DIRECTORY" -type f -name "text.txt" | wc -l;
+}
+
+function exists_text_db {
+
+    local COLLECTION="${1}"
+    local UUID="${2}"
+    
+    local DATABASE=`database $COLLECTION`
+    
+    if [ ! -f "$DATABASE" ];
+    then
+        return;
+    fi;
+    
+    sqlite3 "$DATABASE" "select count(1) from text_ where uuid_ = '$UUID';";
 }
 
 function import_text_fs {
@@ -146,6 +176,8 @@ function import_file {
     local COLLECTION=${1}
     local INPUT_FILE=${2}
     
+    local IMPORT_TO_DATABASE=${options["d"]}
+    
     if [[ ! -f "$INPUT_FILE" ]];
     then
         echo "abw-import.sh: $INPUT_FILE: File not found" 1>&2;
@@ -161,14 +193,32 @@ function import_file {
     local HASH=`hash "$INPUT_FILE"`
     local UUID=`uuid "$HASH"`
     
-    import_text_fs "$COLLECTION" "$INPUT_FILE" "$UUID"
-    import_text_db "$COLLECTION" "$INPUT_FILE" "$UUID"
+    if [ "$IMPORT_TO_DATABASE" = 'd' ];
+    then
     
-    import_meta_fs "$COLLECTION" "$INPUT_FILE" "$UUID" "$HASH"
-    import_meta_db "$COLLECTION" "$INPUT_FILE" "$UUID" "$HASH"
+        local EXISTS=`exists_text_db "$COLLECTION" "$UUID"`
+        if [[ "$EXISTS" -gt 0 ]];
+        then
+            echo "abw-import.sh: $INPUT_FILE: Already imported" 1>&2;
+            return;
+        fi;
+        
+        import_text_db "$COLLECTION" "$INPUT_FILE" "$UUID"
+        import_meta_db "$COLLECTION" "$INPUT_FILE" "$UUID" "$HASH"
+        import_data_db "$COLLECTION" "$INPUT_FILE" "$UUID"
+    else
     
-    import_data_fs "$COLLECTION" "$INPUT_FILE" "$UUID"
-    import_data_db "$COLLECTION" "$INPUT_FILE" "$UUID"
+        local EXISTS=`exists_text_fs "$COLLECTION" "$UUID"`
+        if [[ "$EXISTS" -gt 0 ]];
+        then
+            echo "abw-import.sh: $INPUT_FILE: Already imported" 1>&2;
+            return;
+        fi;
+        
+        import_text_fs "$COLLECTION" "$INPUT_FILE" "$UUID"
+        import_meta_fs "$COLLECTION" "$INPUT_FILE" "$UUID" "$HASH"
+        import_data_fs "$COLLECTION" "$INPUT_FILE" "$UUID"
+    fi;
     
     if [[ ${options["v"]} ]]; then
         echo "Imported '$INPUT_FILE'"

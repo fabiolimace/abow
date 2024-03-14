@@ -203,6 +203,15 @@ abw -i FILE [...]
 abw --import FILE [...]
 ```
 
+Import files to database:
+
+```bash
+abw -i -d FILE [...]
+```
+```bash
+abw --import --database FILE [...]
+```
+
 Import files recursivelly:
 
 ```bash
@@ -233,10 +242,44 @@ If a file exists, an error message is written to `/dev/stderr`.
 
 You can force to import files again using the `--force` option.
 
-The `data` directory
+The collection database
 ------------------------------------------------------
 
-The imported files are stored in the `data` folder.
+The imported files are inserted into a SQLite database called "collection.db" under the `data` folder.
+
+```sql
+CREATE TABLE text_ (
+    uuid_ TEXT PRIMARY KEY, content_ TEXT
+) STRICT;
+
+CREATE TABLE meta_ (
+    uuid_ TEXT PRIMARY KEY,
+    hash_ TEXT, name_ TEXT, path_ TEXT,
+    mime_ TEXT, date_ TEXT, lines_ INTEGER,
+    words_ INTEGER, bytes_ INTEGER, chars_ INTEGER,
+    CONSTRAINT meta_fk_ FOREIGN KEY (uuid_) REFERENCES text_ (uuid_)
+) STRICT;
+
+
+CREATE TABLE data_ (
+    uuid_ TEXT, token_ TEXT, type_ TEXT,
+    count_ INTEGER, ratio_ REAL, format_ TEXT,
+    case_ TEXT, length_ INTEGER, indexes_ TEXT, 
+    CONSTRAINT data_pk_ PRIMARY KEY (uuid_,
+    FOREIGN KEY (uuid_) REFERENCES text_ (uuid_)
+) STRICT;
+```
+
+Where:
+
+*   `data_`: is the table containing the bag of words.
+*   `meta_`: is the table containing some properties.
+*   `text_`: is the table with the contents of the input text file.
+
+By default, the files are imported to a collection directory (the next section). To import into a SQLite database, use the switch `--database`.
+
+The collection directory
+------------------------------------------------------
 
 The imported files are grouped in sub-folders called "collections" under the `data` folder.
 
@@ -272,8 +315,7 @@ And where:
 
 The maximum number of files per directory on VFAT is 21845.33 (2^16/3). The maximum number of entries is 2^16 on VFAT. Each file on VFAT occupies at least 3 entries: 1 entry for short name (DOS compatible), and at least 2 entries for 2 long name (up to 20 entries = 255 chars).
 
-The `data.tsv` file
-------------------------------------------------------
+### The `data.tsv` file
 
 The `data.tsv` file is a tab-separated value file containing a bag of words.
 

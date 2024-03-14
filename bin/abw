@@ -27,8 +27,9 @@
 #    abw --options lang=pt,nostopwords,lower,ascii FILE [...]
 #
 #    abw --import FILE [...]
-#    abw --import -recursive DIRECTORY [...]
-#    abw --import -recursive --collection COLLECTION DIRECTORY [...]
+#    abw --import --database FILE [...]
+#    abw --import --recursive DIRECTORY [...]
+#    abw --import --recursive --collection COLLECTION DIRECTORY [...]
 #
 
 BASEDIR=`dirname $0`
@@ -52,6 +53,7 @@ args=${args//--options/-o}
 args=${args//--fields/-f}
 # import
 args=${args//--import/-i}
+args=${args//--database/-d}
 args=${args//--recursive/-r}
 # check
 args=${args//--check/-k}
@@ -66,7 +68,7 @@ shopt -s extglob # remove unknown
 args=${args//--+([a-zA-Z0-9-])/-?}
 
 declare -A options;
-OPTSTRING="lsgpo:f:w:irkc:vmdh"
+OPTSTRING="lsgpo:f:w:idrkc:vmdh"
 
 while getopts "$OPTSTRING" name ${args}; do
 
