@@ -29,9 +29,6 @@ function checksum {
 REGEX="${1}";
 COLLECTION="${options["c"]:-default}"
 
-UUID=`pad`; # wildcard-padded UUID
-ROAD=`road "$COLLECTION" "$UUID"`;
-
 if [[ ! -d "$DATADIR/$COLLECTION" ]]; then
     echo "abw-grep.sh: $COLLECTION: Collection not found" 1>&2;
     exit 1;

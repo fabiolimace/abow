@@ -13,7 +13,12 @@ source `dirname $0`/abw-common.sh
 
 UUID="${1}";
 COLLECTION="${options["c"]:-default}"
-ROAD=`road "$COLLECTION" "$UUID"`;
+ROAD=`directory "$COLLECTION" "$UUID"`;
+
+if [[ -z "$UUID" ]]; then
+    echo "abw-show.sh: UUID required" 1>&2;
+    exit 1;
+fi;
 
 if [[ ! -d "$DATADIR/$COLLECTION" ]]; then
     echo "abw-show.sh: $COLLECTION: Collection not found" 1>&2;
