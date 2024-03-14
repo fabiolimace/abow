@@ -260,7 +260,6 @@ CREATE TABLE meta_ (
     CONSTRAINT meta_fk_ FOREIGN KEY (uuid_) REFERENCES text_ (uuid_)
 ) STRICT;
 
-
 CREATE TABLE data_ (
     uuid_ TEXT, token_ TEXT, type_ TEXT,
     count_ INTEGER, ratio_ REAL, format_ TEXT,

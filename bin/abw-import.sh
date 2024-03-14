@@ -84,12 +84,10 @@ function import_text_db {
     local UUID="${3}"
     
     local DATABASE=`database $COLLECTION`
-    local CONTENT=`cat "$INPUT_FILE"`
     
     create_database "$DATABASE"
     
-    CONTENT=${CONTENT//\'/\'\'}; # escape quotes for SQLite
-    sqlite3 "$DATABASE" "INSERT INTO text_ values ('$UUID', '$CONTENT');"; # FIXME: /usr/bin/sqlite3: Lista de argumentos muito longa
+    cat "$INPUT_FILE" | sed "s/'/''/g" | awk '{content=content $0} END{ printf "INSERT INTO text_ values '"('%s', '%s');"'", "'$UUID'", content }' | sqlite3 "$DATABASE"
 }
 
 function import_meta_fs {
