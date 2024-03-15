@@ -79,9 +79,9 @@ function list_db {
 COLLECTION="${options["c"]:-default}";
 METAFIELDS="${options["m"]:=uuid,collection,name,bytes,date}"
 
-#if [[ -d "$DATADIR/$COLLECTION" ]]; then
-#    list_fs "$COLLECTION" "$METAFIELDS";
-if [[ -f "$DATADIR/$COLLECTION.db" ]]; then
+if [[ -d "$DATADIR/$COLLECTION" ]]; then
+    list_fs "$COLLECTION" "$METAFIELDS";
+elif [[ -f "$DATADIR/$COLLECTION.db" ]]; then
     list_db "$COLLECTION" "$METAFIELDS";
 else
     echo "abw-grep.sh: $COLLECTION: Collection not found" 1>&2;
