@@ -26,7 +26,7 @@ function glob_db {
     
     local DATABASE=`database $COLLECTION`
     
-    sqlite3 "$DATABASE" "select * from text_ where content_ glob '$REGEX'";
+    sqlite3 -header "$DATABASE" "select * from text_ where content_ glob '$REGEX'";
 }
 
 REGEX="${1}";

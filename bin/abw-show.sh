@@ -40,11 +40,11 @@ function show_db {
     local DATABASE=`database $COLLECTION`
     
     if [[ ${options["m"]} ]]; then
-        sqlite3 "$DATABASE" "select * from meta_ where uuid_ = '$UUID'";
+        sqlite3 -column -header "$DATABASE" "select * from meta_ where uuid_ = '$UUID'";
     elif [[ ${options["d"]} ]]; then
-        sqlite3 "$DATABASE" "select * from data_ where uuid_ = '$UUID'";
+        sqlite3 -column -header "$DATABASE" "select * from data_ where uuid_ = '$UUID'";
     else
-        sqlite3 "$DATABASE" "select * from text_ where uuid_ = '$UUID'";
+        sqlite3 -header "$DATABASE" "select * from text_ where uuid_ = '$UUID'";
     fi;
 }
 
