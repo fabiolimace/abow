@@ -27,7 +27,7 @@ function create_database {
     
     sqlite3 "$DATABASE" <<EOF
 CREATE TABLE text_ (uuid_ TEXT PRIMARY KEY, content_ TEXT) STRICT;
-CREATE TABLE meta_ (uuid_ TEXT PRIMARY KEY, hash_ TEXT, name_ TEXT, path_ TEXT, mime_ TEXT, date_ TEXT, lines_ INTEGER, words_ INTEGER, bytes_ INTEGER, chars_ INTEGER, CONSTRAINT meta_fk_ FOREIGN KEY (uuid_) REFERENCES text_ (uuid_))  STRICT;
+CREATE TABLE meta_ (uuid_ TEXT PRIMARY KEY, collection_ TEXT, hash_ TEXT, name_ TEXT, path_ TEXT, mime_ TEXT, date_ TEXT, lines_ INTEGER, words_ INTEGER, bytes_ INTEGER, chars_ INTEGER, CONSTRAINT meta_fk_ FOREIGN KEY (uuid_) REFERENCES text_ (uuid_))  STRICT;
 CREATE TABLE data_ (uuid_ TEXT, token_ TEXT, type_ TEXT, count_ INTEGER, ratio_ REAL, format_ TEXT, case_ TEXT, length_ INTEGER, indexes_ TEXT, CONSTRAINT data_pk_ PRIMARY KEY (uuid_, token_), CONSTRAINT data_fk_ FOREIGN KEY (uuid_) REFERENCES text_ (uuid_))  STRICT;
 EOF
 
@@ -111,8 +111,8 @@ function import_meta_fs {
     local OUTPUT_FILE="$DIRECTORY/meta.txt"
     
     echo -n > $OUTPUT_FILE
-    echo "collection=$COLLECTION" >> $OUTPUT_FILE
     echo "uuid=$UUID" >> $OUTPUT_FILE
+    echo "collection=$COLLECTION" >> $OUTPUT_FILE
     echo "hash=$HASH" >> $OUTPUT_FILE
     echo "name=$NAME" >> $OUTPUT_FILE
     echo "path=$ROAD" >> $OUTPUT_FILE # TODO: change to the relative path inside the collection
@@ -145,7 +145,7 @@ function import_meta_db {
     
     NAME=${NAME//\'/\'\'}; # escape quotes for SQLite
     ROAD=${ROAD//\'/\'\'}; # escape quotes for SQLite
-    sqlite3 "$DATABASE" "INSERT INTO meta_ values ('$UUID', '$HASH', '$NAME', '$ROAD', '$MIME', '$DATE', '$LINES', '$WORDS', '$BYTES', '$CHARS');";
+    sqlite3 "$DATABASE" "INSERT INTO meta_ values ('$UUID', '$COLLECTION', '$HASH', '$NAME', '$ROAD', '$MIME', '$DATE', '$LINES', '$WORDS', '$BYTES', '$CHARS');";
 }
 
 function import_data_fs {
