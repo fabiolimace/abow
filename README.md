@@ -235,7 +235,7 @@ CREATE TABLE text_ (
 ) STRICT;
 
 CREATE TABLE meta_ (
-    uuid_ TEXT PRIMARY KEY,
+    uuid_ TEXT PRIMARY KEY, collection_ TEXT,
     hash_ TEXT, name_ TEXT, path_ TEXT,
     mime_ TEXT, date_ TEXT, lines_ INTEGER,
     words_ INTEGER, bytes_ INTEGER, chars_ INTEGER,
