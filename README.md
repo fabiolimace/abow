@@ -174,24 +174,6 @@ abw -g REGEX
 abw --grep REGEX
 ```
 
-Search in `meta.txt` files using a regex:
-
-```bash
-abw -g -m REGEX
-```
-```bash
-abw --grep --meta REGEX
-```
-
-Search in `data.tsv` files using a regex:
-
-```bash
-abw -g -d REGEX
-```
-```bash
-abw --grep -data REGEX
-```
-
 ### Import files
 
 Import files:
