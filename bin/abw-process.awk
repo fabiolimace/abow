@@ -1,4 +1,4 @@
-#!/usr/bin/gawk -f
+#!/usr/bin/awk -f
 
 # Notes:
 #   * Files encoded using MAC-UTF-8 must be normalized to UTF-8.
@@ -11,14 +11,13 @@ function token_type(token)
 
 function token_format(token)
 {
-    switch (token) {
-    case /^[[:alpha:]-]+$/:
+    if (token ~ /^[[:alpha:]-]+$/) {
         return "W"; # Word format: all-letter token (with hyphen)
-    case /^[[:digit:]]+$/:
+    } else if (token ~ /^[[:digit:]]+$/) {
         return "N"; # Number format: all-digit token
-    case /^[[:punct:]]+$/:
+    } else if (token ~ /^[[:punct:]]+$/) {
         return "P"; # Punct format: all-punct token
-    default:
+    } else {
         return "NA"; # None of the above
     }
     
@@ -29,18 +28,17 @@ function token_format(token)
 
 function token_case(token)
 {
-    switch (token) {
-    case /^[[:lower:]]+(-([[:alpha:]]+))*$/:
+    if (token ~ /^[[:lower:]]+(-([[:alpha:]]+))*$/) {
         return "L"; # Lower case: "word", "compound-wOrD"
-    case /^[[:upper:]][[:lower:]]*(-([[:alpha:]]+))*$/:
+    } else if (token ~ /^[[:upper:]][[:lower:]]*(-([[:alpha:]]+))*$/) {
         return "S"; # Start case: "Word", "Compound-wOrD"
-    case /^[[:upper:]]+(-([[:alpha:]]+))*$/:
+    } else if (token ~ /^[[:upper:]]+(-([[:alpha:]]+))*$/) {
         return "U"; # Upper case: "WORD", "COMPOUND-wOrD"
-    case /^[[:upper:]]?[[:lower:]]+([[:upper:]][[:lower:]]+)+$/:
+    } else if (token ~ /^[[:upper:]]?[[:lower:]]+([[:upper:]][[:lower:]]+)+$/) {
         return "C"; # Camel case: "compoundWord", "CompoundWord"
-    case /^[[:alpha:]]+(-([[:alpha:]]+))*$/:
+    } else if (token ~ /^[[:alpha:]]+(-([[:alpha:]]+))*$/) {
         return "M"; # Mixed case: "wOrD", "cOmPoUnD-wOrD"
-    default:
+    } else {
         return "NA"; # None of the above
     }
     
@@ -130,7 +128,11 @@ function get_stopwords_regex(    file, regex, line) {
 function separate_tokens() {
 
     line=" " $0 " ";
-    
+
+    # this line is AWK-generic if needed
+    # gsub(/[^[:alnum:]]/, " & ", line);
+
+    # these lines are GAWK-specific
     line=gensub(/([\(\)\[\]\{\}])/, " \\1 ", "g", line);
     line=gensub(/([^,;:.…!?])([,;:.…!?][[:punct:]]*[[:space:]])/, "\\1 \\2", "g", line);
     line=gensub(/([^[:alnum:]])([\x22\x27“”‘’«»])([[:alnum:][:punct:]])/, "\\1 \\2 \\3", "g", line);
@@ -140,12 +142,12 @@ function separate_tokens() {
     $0 = line;
 }
 
-function generate_records(    count, ratio, sum, sep, row, f, k)
-{    
+function generate_records(    token, count, ratio, sum, sep, r, f, flength, key, val)
+{
     # start of operational checks #
     sum=0
-    for (k in counters) {
-        sum += counters[k];
+    for (token in counters) {
+        sum += counters[token];
     }    
     if (sum != length(tokens)) {
         print "Wrong sum of counts" > "/dev/stderr";
@@ -153,68 +155,64 @@ function generate_records(    count, ratio, sum, sep, row, f, k)
     }
     # end of operational checks #
  
-    row=0
-    PROCINFO["sorted_in"]=sort_order;
+    r=0
     for (token in counters) {
 
-    	row++;
+    	r++;
         sep = ""
+        flength = fields[0];
         count = counters[token];
         ratio = count / length(tokens);
 
-        PROCINFO["sorted_in"]="@unsorted"
-        for (f in fields) {
-                if (fields[f]["value"] == 0) continue;
-                switch (fields[f]["key"]) {
-                case "token":
-                    records[row]["token"] = token;
-                    break;
-                case "type":
-                    records[row]["type"]= types[token];
-                    break;
-                case "count":
-                    records[row]["count"] = count;
-                    break;
-                case "ratio":
-                    records[row]["ratio"] = ratio;
-                    break;
-                case "format":
-                    records[row]["format"] = formats[token];
-                    break;
-                case "case":
-                    records[row]["case"] = cases[token];
-                    break;
-                case "length":
-                    records[row]["length"] = length(token);
-                    break;
-                case "indexes":
-                    records[row]["indexes"] = indexes[token];
-                    break;
-                default:
+        for (f = 1; f <= flength; f++) {
+                key = fields[f,"key"];
+                val = fields[f,"value"];
+                if (val == 0) continue;
+                if (key == "token")  {
+                    records[r,"token"] = token;
+                } else if (key == "type")  {
+                    records[r,"type"] = types[token];
+                } else if (key == "count")  {
+                    records[r,"count"] = count;
+                } else if (key == "ratio")  {
+                    records[r,"ratio"] = ratio;
+                } else if (key == "format")  {
+                    records[r,"format"] = formats[token];
+                } else if (key == "case")  {
+                    records[r,"case"] = cases[token];
+                } else if (key == "length")  {
+                    records[r,"length"] = length(token);
+                } else if (key == "indexes")  {
+                    records[r,"indexes"] = indexes[token];
+                } else {
                     continue;
                 }
             sep="\t"
         }
     }
-    PROCINFO["sorted_in"]="@unsorted"
+    
+    # array length
+    records[0] = r;
 }
 
-function print_records(    r, f, sep)
+function print_records(    sep, r, f, rlength, flength)
 {
+    flength = fields[0];
+    rlength = records[0];
+    
     if (length(records)) {
         sep = ""
-        for (f in fields) {
-            if (fields[f]["value"] == 0) continue;
-            printf "%s%s", sep, toupper(fields[f]["key"]) > output;
+        for (f = 1; f <= flength; f++) {
+            if (fields[f,"value"] == 0) continue;
+            printf "%s%s", sep, toupper(fields[f,"key"]) > output;
             sep = "\t"
         }
         printf "\n" > output;
-
-        for (r in records) {
-         	sep = ""
-        	for (f in fields) {
-                if (fields[f]["value"] == 0) continue;
-    	    	printf "%s%s", sep, records[r][fields[f]["key"]] > output;
+        for (r = 1; r <= rlength; r++) {
+            sep = ""
+            for (f = 1; f <= flength; f++) {
+                if (fields[f,"value"] == 0) continue;
+    	    	printf "%s%s", sep, records[r,fields[f,"key"]] > output;
     		    sep = "\t"
     	    }
             printf "\n" > output;
@@ -248,15 +246,17 @@ function parse_confs(    file, line, string)
         else string=string "," line;
     }
 
+    fields[0] = 0; # declare array
     parse_fields(FIELDS, fields);
     if (length(fields) == 0) {
         parse_fields(string, fields);
     }
 
+    options[0] = 0; # declare array
     parse_options(OPTIONS, options);
     if (length(options) == 0) {
         parse_options(string, options);
-    }
+   }
 }
 
 function parse_fields(string, fields,    default_string)
@@ -303,25 +303,26 @@ function parse_key_values(string, keyvalues,     default_string, items, i, key, 
             key = substr(items[i], 0, splitter - 1);
             value = substr(items[i], splitter + 1);
         }
-        keyvalues[i]["key"] = key;
-        keyvalues[i]["value"] = value;
+        keyvalues[i,"key"] = key;
+        keyvalues[i,"value"] = value;
     }
+    
+    # save the array length
+    keyvalues[0] = length(items);
 }
 
-function get_sort_order(    sort_order)
+function get_sort_order(    sort_order, o, olength, key)
 {
-    sort_order="@unsorted"
-    for (o in options) {
-        switch (options[o]["key"]) {
-        case "asc":
-            if (options[o]["value"] == "token") sort_order = "@ind_str_asc";
-            if (options[o]["value"] == "count") sort_order = "@val_num_asc";
-            break;
-        case "desc":
-            if (options[o]["value"] == "token") sort_order = "@ind_str_desc";
-            if (options[o]["value"] == "count") sort_order = "@val_num_desc";
-            break;
-        default:
+    olength = options[0];
+    for (o = 1; o <= olength; o++) {
+        key = options[o,"key"];
+        if (key == "asc") {
+            if (options[o,"value"] == "token") sort_order = "@ind_str_asc";
+            if (options[o,"value"] == "count") sort_order = "@val_num_asc";
+        } else if (key == "desc") {
+            if (options[o,"value"] == "token") sort_order = "@ind_str_desc";
+            if (options[o,"value"] == "count") sort_order = "@val_num_desc";
+        } else {
             continue;
         }
     }
@@ -337,31 +338,29 @@ function remove_stopwords(    i)
     IGNORECASE=0;
 }
 
-function transform_line()
+function transform_line(    o, olength, key)
 {
-    for (o in options) {
-        switch (options[o]["key"]) {
-        case "ascii":
-            if (options[o]["value"] == 1) $0 = toascii($0);
-            break;
-        case "lower":
-            if (options[o]["value"] == 1) $0 = tolower($0);
-            break;
-        case "upper":
-            if (options[o]["value"] == 1) $0 = toupper($0);
-            break;
-        case "stopwords":
-            if (options[o]["value"] == 0) remove_stopwords();
-            break;
-        default:
+    olength = options[0];
+    for (o = 1; o <= olength; o++) {
+        key = options[o,"key"];
+        if (key == "ascii") {
+            if (options[o,"value"] == 1) $0 = toascii($0);
+        } else if (key == "lower") {
+            if (options[o,"value"] == 1) $0 = tolower($0);
+        } else if (key == "upper") {
+            if (options[o,"value"] == 1) $0 = toupper($0);
+        } else if (key == "stopwords") {
+            if (options[o,"value"] == 0) remove_stopwords();
+        } else {
             continue;
         }
     }
 }
 
-function option_value(key,    o) {
-    for (o in options) {
-        if (options[o]["key"] == key) return options[o]["value"];
+function option_value(key,    o, olength) {
+    olength = options[0];
+    for (o = 1; o <= olength; o++) {
+        if (options[o,"key"] == key) return options[o,"value"];
     }
     return 0;
 }
@@ -378,7 +377,16 @@ BEGIN {
     stopwords_regex = get_stopwords_regex();
 }
 
-BEGINFILE {
+function endfile() {
+    output=WRITETO;
+    filedir=basedir(FILENAME)
+    filename=basename(FILENAME)
+    sub(/:filedir/, filedir, output);
+    sub(/:filename/, filename, output);
+ 
+    generate_records();
+    print_records();
+
     idx = 0;
     delete tokens;
     delete types;
@@ -387,6 +395,10 @@ BEGINFILE {
     delete cases;
     delete indexes;
     delete records;
+}
+
+FNR == 1 && (NR > 1) {
+    endfile();
 }
 
 NF {
@@ -401,17 +413,6 @@ NF {
     if (eol) insert_token("<eol>");
 }
 
-ENDFILE {
-
-    output=WRITETO;
-    filedir=basedir(FILENAME)
-    filename=basename(FILENAME)
-    sub(/:filedir/, filedir, output);
-    sub(/:filename/, filename, output);
- 
-    generate_records();
-    print_records();
-
+END {
+    endfile();
 }
-
-
